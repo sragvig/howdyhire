@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  /* Aggie Maroon scale — 800 is the official #500000 */
+  --color-maroon-50: #fdf3f3;
+  --color-maroon-100: #fbe4e4;
+  --color-maroon-200: #f5c6c6;
+  --color-maroon-300: #ec9a9a;
+  --color-maroon-400: #db5f5f;
+  --color-maroon-500: #b83131;
+  --color-maroon-600: #921818;
+  --color-maroon-700: #700a0a;
+  --color-maroon-800: #500000;
+  --color-maroon-900: #3c0000;
+  --color-maroon-950: #240000;
+
+  --color-aggie: #500000;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  @apply bg-stone-50 text-stone-900;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+  /* Keep maroon fills and chart bars when printing / saving as PDF. */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
