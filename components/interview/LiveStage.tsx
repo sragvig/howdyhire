@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Reveille } from "@/components/mascot/Reveille";
 
-// The live stage: Miss Rev listens along. A soft gold ring breathes gently with the audio level;
+// The live stage: the Reveille mascot listens along. A soft gold ring breathes gently with the audio level;
 // no bars, glows, or gradients.
 export function LiveStage({
   active,
@@ -49,12 +49,12 @@ export function LiveStage({
   }, [active, speaking, getInput, getOutput]);
 
   const status = connecting
-    ? "Miss Rev is getting things ready"
+    ? "HowdyHire is getting things ready"
     : !active
-      ? "Miss Rev is ready when you are"
+      ? "HowdyHire is ready when you are"
       : speaking
         ? `${interviewerName} is asking`
-        : "Miss Rev is listening";
+        : "HowdyHire is listening";
 
   return (
     <div className="flex flex-col items-center text-center">
@@ -67,8 +67,8 @@ export function LiveStage({
             active ? (speaking ? "border-maroon-200" : "border-gold-300") : "border-stone-200"
           }`}
         />
-        <span className={`relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-cream-200 ${active ? "animate-bob" : ""}`}>
-          <Reveille mood={active && !speaking ? "listening" : "happy"} size={120} className="translate-y-2" />
+        <span className={`relative rounded-full border-2 border-maroon-800 ${active ? "animate-bob" : ""}`}>
+          <Reveille mood={active && !speaking ? "listening" : "happy"} size={124} priority />
         </span>
       </div>
 
@@ -77,7 +77,7 @@ export function LiveStage({
         {(active || connecting) && (
           <span className="flex gap-0.5" aria-hidden>
             {[0, 1, 2].map((i) => (
-              <span key={i} className="h-1.5 w-1.5 animate-dot rounded-full bg-aggie" style={{ animationDelay: `${i * 0.15}s` }} />
+              <span key={i} className="h-1.5 w-1.5 animate-dot rounded-full bg-aggie dark:bg-maroon-400" style={{ animationDelay: `${i * 0.15}s` }} />
             ))}
           </span>
         )}

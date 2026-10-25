@@ -18,7 +18,7 @@ export function Logo({ onMaroon = true }: { onMaroon?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2.5">
       <RevAvatar size={38} ring={false} />
-      <span className={`font-display text-lg font-bold tracking-tight ${onMaroon ? "text-cream-50" : "text-aggie"}`}>
+      <span className={`font-display text-lg font-bold tracking-tight ${onMaroon ? "text-cream-50" : "text-accent"}`}>
         HowdyHire
       </span>
     </Link>

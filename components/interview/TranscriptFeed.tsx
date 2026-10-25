@@ -27,10 +27,10 @@ export function TranscriptFeed({ entries, interviewerName }: { entries: Transcri
               <div key={e.id} className={`flex animate-fade-up ${isCandidate ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                    isCandidate ? "rounded-br-md bg-aggie text-cream-50" : "rounded-bl-md bg-cream-200 text-fg"
+                    isCandidate ? "rounded-br-md bg-aggie text-cream-50" : "rounded-bl-md bg-surface-muted text-fg"
                   }`}
                 >
-                  <p className={`mb-0.5 text-[11px] font-semibold ${isCandidate ? "text-maroon-200" : "text-aggie"}`}>
+                  <p className={`mb-0.5 text-[11px] font-semibold ${isCandidate ? "text-white/70" : "text-accent"}`}>
                     {isCandidate ? "You" : interviewerName}
                   </p>
                   {e.text}

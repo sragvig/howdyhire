@@ -36,13 +36,13 @@ function StatusCard({
             <Check className="h-3.5 w-3.5" strokeWidth={3} /> Done
           </span>
         ) : (
-          <span className="rounded-full bg-maroon-50 px-2.5 py-0.5 text-xs font-semibold text-aggie">To do</span>
+          <span className="rounded-full bg-maroon-50 px-2.5 py-0.5 text-xs font-semibold text-accent">To do</span>
         )}
       </div>
       <p className="mt-4 text-xs font-medium text-fg-subtle">{label}</p>
       <p className="mt-0.5 truncate font-display text-lg font-semibold text-fg">{title}</p>
       <p className="mt-1 line-clamp-2 text-sm text-fg-muted">{detail}</p>
-      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-aggie">
+      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-accent">
         {done ? "Change" : "Set it up"} <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       </span>
     </Link>
@@ -72,15 +72,15 @@ export function Dashboard() {
       {/* Welcome banner */}
       <section className={`${surface} relative overflow-hidden p-8 sm:p-10`}>
         <div className="relative flex flex-col items-center gap-8 md:flex-row">
-          <span className="flex h-40 w-40 shrink-0 animate-bob items-center justify-center overflow-hidden rounded-full bg-cream-200 ring-4 ring-gold-200">
-            <Reveille mood="happy" size={150} className="translate-y-3" />
+          <span className="shrink-0 animate-bob rounded-full border-4 border-maroon-800 ring-4 ring-gold-200">
+            <Reveille mood="happy" size={152} priority />
           </span>
           <div className="animate-fade-up text-center md:text-left">
             <p className="inline-flex items-center gap-1.5 rounded-full bg-gold-50 px-3 py-1 text-xs font-semibold text-gold-700 ring-1 ring-inset ring-gold-200">
               Gig &apos;em, {first ?? "Ags"}!
             </p>
             <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
-              Howdy! Miss Rev is ready to help you practice.
+              Howdy! HowdyHire is ready to help you practice.
             </h1>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-fg-muted">
               Practice behavioral interviews out loud with a friendly AI interviewer who knows your resume and the job you want.
@@ -148,7 +148,7 @@ export function Dashboard() {
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold text-fg">Recent practice</h2>
           {library.length > 0 && (
-            <Link href="/library" className="text-sm font-semibold text-aggie hover:underline">
+            <Link href="/library" className="text-sm font-semibold text-accent hover:underline">
               See all
             </Link>
           )}
@@ -170,7 +170,7 @@ export function Dashboard() {
                 <p className="flex items-center gap-1.5 text-xs text-fg-subtle">
                   <Trophy className="h-3.5 w-3.5 text-gold-600" /> Best score
                 </p>
-                <p className="font-display text-3xl font-bold tabular-nums text-aggie">{best}</p>
+                <p className="font-display text-3xl font-bold tabular-nums text-accent">{best}</p>
               </div>
             </div>
             {library.slice(0, 3).map((e) => (
@@ -180,7 +180,7 @@ export function Dashboard() {
                     <p className="truncate font-semibold text-fg">{e.job.title}</p>
                     <p className="truncate text-sm text-fg-subtle">{e.job.company}</p>
                   </div>
-                  <span className="rounded-full bg-cream-200 px-2.5 py-0.5 font-display text-lg font-bold tabular-nums text-aggie">
+                  <span className="rounded-full bg-surface-muted px-2.5 py-0.5 font-display text-lg font-bold tabular-nums text-accent">
                     {e.feedback.overallScore}
                   </span>
                 </div>

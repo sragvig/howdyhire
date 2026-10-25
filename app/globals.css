@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* `dark:` utilities follow the theme switch (data-theme on <html>), not just the OS setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   /* Aggie Maroon scale (800 is the official #500000) */
   --color-maroon-50: #fbf3f3;
@@ -143,6 +146,68 @@
 body {
   background: var(--canvas);
   color: var(--fg);
+}
+
+/* Dark theme (screen only, so printing and "Save as PDF" stay light).
+   Besides the semantic tokens, the light tint/neutral shades used for backgrounds, borders, and
+   text are remapped here, so components switch themes without per-class dark: variants.
+   Solid fills (bg-aggie, gold-400+, emerald-500/600) intentionally stay the same. */
+@media screen {
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --canvas: #171311;
+    --surface: #211b18;
+    --surface-strong: #211b18;
+    --surface-muted: #2b241f;
+    --line: #3a322d;
+    --line-strong: #4a413b;
+    --fg: #f5efe6;
+    --fg-muted: #d6cdc2;
+    --fg-subtle: #a89d92;
+    --accent-fg: #f0a8a8;
+    --gold-fg: #eed25a;
+    --good-fg: #6ee7b7;
+    --warn-fg: #fcd34d;
+    --bad-fg: #fca5a5;
+
+    /* warm neutrals, inverted */
+    --color-stone-50: #1d1816;
+    --color-stone-100: #2b241f;
+    --color-stone-200: #3a322d;
+    --color-stone-300: #4a413b;
+    --color-stone-400: #7d7268;
+    --color-stone-500: #a89d92;
+    --color-stone-600: #c9bfb4;
+    --color-stone-700: #e2d9cf;
+
+    /* tinted backgrounds become deep tints; their text shades become light */
+    --color-maroon-50: #3a1d1d;
+    --color-maroon-100: #4a2424;
+    --color-maroon-200: #5e2c2c;
+    --color-maroon-300: #7a3a3a;
+    --color-gold-50: #352c12;
+    --color-gold-100: #463a15;
+    --color-gold-200: #5c4b1a;
+    --color-gold-700: #eed25a;
+    --color-emerald-50: #10301f;
+    --color-emerald-100: #14402a;
+    --color-emerald-200: #1c5236;
+    --color-emerald-300: #23663f;
+    --color-emerald-700: #6ee7b7;
+    --color-emerald-800: #a7f3d0;
+    --color-emerald-900: #d1fae5;
+    --color-red-50: #3b1717;
+    --color-red-200: #6b2424;
+    --color-red-800: #fecaca;
+    --color-sky-50: #10283a;
+    --color-sky-200: #1d4a66;
+    --color-sky-800: #bae6fd;
+  }
+
+  :root[data-theme="dark"] ::selection {
+    background: #5e2c2c;
+    color: #fff;
+  }
 }
 
 ::selection {

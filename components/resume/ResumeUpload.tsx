@@ -179,7 +179,7 @@ export function ResumeUpload() {
               : "border-stone-300 hover:border-maroon-300 hover:bg-maroon-50/50"
           }`}
         >
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-50 text-aggie ring-1 ring-inset ring-maroon-100">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-50 text-accent ring-1 ring-inset ring-maroon-100">
             {loading ? <Loader2 className="h-7 w-7 animate-spin" /> : <Upload className="h-7 w-7" />}
           </span>
           <p className="mt-4 font-medium text-fg">{loading ? "Parsing with Gemini…" : "Drop a PDF or .txt, or click to browse"}</p>

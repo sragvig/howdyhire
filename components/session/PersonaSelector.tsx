@@ -19,7 +19,7 @@ function DifficultyMeter({ level }: { level: 1 | 2 | 3 }) {
     <span className="inline-flex items-center gap-1.5" aria-label={`Difficulty: ${DIFFICULTY[level - 1]}`}>
       <span className="flex gap-0.5" aria-hidden>
         {[1, 2, 3].map((i) => (
-          <span key={i} className={`h-2 w-2 rounded-full ${i <= level ? "bg-aggie" : "bg-stone-200"}`} />
+          <span key={i} className={`h-2 w-2 rounded-full ${i <= level ? "bg-aggie dark:bg-maroon-400" : "bg-stone-200"}`} />
         ))}
       </span>
       <span className="text-xs font-medium text-fg-muted">{DIFFICULTY[level - 1]}</span>
@@ -55,7 +55,7 @@ export function PersonaSelector() {
             <div className="flex items-center gap-3">
               <span
                 className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display text-xl font-bold ${
-                  selected ? "bg-aggie text-cream-50" : "bg-maroon-50 text-aggie"
+                  selected ? "bg-aggie text-cream-50" : "bg-maroon-50 text-accent"
                 }`}
               >
                 {p.interviewerName[0]}
@@ -63,7 +63,7 @@ export function PersonaSelector() {
               <div className="min-w-0">
                 <p className="font-display text-lg font-bold text-fg">{p.interviewerName}</p>
                 <p className="flex items-center gap-1.5 text-xs font-medium text-fg-muted">
-                  <Icon className="h-3.5 w-3.5 text-aggie" /> {p.label}
+                  <Icon className="h-3.5 w-3.5 text-accent" /> {p.label}
                 </p>
               </div>
             </div>

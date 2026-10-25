@@ -75,7 +75,7 @@ function SessionCard({ entry }: { entry: PastInterview }) {
         </dl>
 
         <div className="mt-auto flex items-center justify-between border-t border-line pt-4">
-          <span className="inline-flex items-center gap-1 text-sm font-semibold text-aggie">
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent">
             See recap <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </span>
           <button
@@ -116,7 +116,7 @@ export function PracticeLibrary() {
         </div>
       ) : entries.length === 0 ? (
         <div className={`${surface} flex flex-col items-center p-12 text-center`}>
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-50 text-aggie ring-1 ring-inset ring-maroon-100">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-50 text-accent ring-1 ring-inset ring-maroon-100">
             <Library className="h-7 w-7" />
           </span>
           <h2 className="mt-4 font-display text-lg font-semibold text-fg">No interviews yet</h2>

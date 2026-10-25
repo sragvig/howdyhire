@@ -35,7 +35,7 @@ export function PersonaSwitcher({
             className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
               selected
                 ? "bg-aggie text-cream-50"
-                : "border border-stone-200 bg-surface text-fg-muted enabled:hover:-translate-y-0.5 enabled:hover:border-maroon-200 enabled:hover:text-aggie"
+                : "border border-stone-200 bg-surface text-fg-muted enabled:hover:-translate-y-0.5 enabled:hover:border-maroon-200 enabled:hover:text-accent"
             }`}
           >
             <Icon className="h-3.5 w-3.5" />

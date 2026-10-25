@@ -20,7 +20,7 @@ export function ActiveJobPill() {
       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-maroon-900">
         {imported ? <Download className="h-3.5 w-3.5" /> : <Briefcase className="h-3.5 w-3.5" />}
       </span>
-      <span className="hidden shrink-0 font-semibold text-aggie lg:inline">Active job:</span>
+      <span className="hidden shrink-0 font-semibold text-accent lg:inline">Active job:</span>
       <span className="min-w-0 truncate text-fg">
         <span className="font-semibold">{job.title}</span>
         <span className="text-fg-subtle"> @ {job.company}</span>

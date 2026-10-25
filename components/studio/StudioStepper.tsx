@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Check } from "lucide-react";
 import { useSession } from "@/components/providers/SessionProvider";
+import { useHydrated } from "@/components/ui/useHydrated";
+import { createSession } from "@/lib/session-reducer";
 import { getPersona } from "@/lib/personas";
 import { getDuration } from "@/lib/durations";
 
@@ -11,10 +13,19 @@ type StepState = "complete" | "current" | "upcoming";
 
 const STUDIO_ROUTES = ["/", "/resume", "/jobs", "/interview"];
 
+// What the server renders: the default session (the saved resume is restored from localStorage
+// only in the browser).
+const PRERENDER_SESSION = createSession();
+
 // The 3-step flow: Import Context → Choose Interviewer → Live Session.
 export function StudioStepper() {
   const pathname = usePathname();
-  const { session } = useSession();
+  const { session: liveSession } = useSession();
+  // This component sits in a Suspense boundary, which hydrates after SessionProvider has already
+  // restored the saved resume. Render the server's view until hydration finishes, or the step
+  // details/classes won't match the server HTML.
+  const hydrated = useHydrated();
+  const session = hydrated ? liveSession : PRERENDER_SESSION;
   if (!STUDIO_ROUTES.includes(pathname)) return null;
 
   const hasContext = !!session.resume && !!session.job;
@@ -46,7 +57,7 @@ export function StudioStepper() {
     },
     {
       label: "Practice live",
-      detail: done ? "Recap ready" : session.status === "scoring" ? "Miss Rev is thinking…" : live ? "In progress" : "Voice session",
+      detail: done ? "Recap ready" : session.status === "scoring" ? "HowdyHire is thinking…" : live ? "In progress" : "Voice session",
       href: "/interview",
       disabled: !hasContext,
     },

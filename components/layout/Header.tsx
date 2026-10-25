@@ -4,6 +4,7 @@ import { useSession } from "@/components/providers/SessionProvider";
 import { SessionStatusBadge } from "@/components/session/SessionStatusBadge";
 import { ActiveJobPill } from "@/components/studio/ActiveJobPill";
 import { RevAvatar } from "@/components/mascot/Reveille";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Logo } from "./Sidebar";
 
 export function Header() {
@@ -19,7 +20,7 @@ export function Header() {
         <div className="hidden items-center gap-3 sm:flex">
           <RevAvatar size={40} />
           <p className="truncate text-sm text-fg-muted">
-            <span className="font-semibold text-fg">Howdy{firstName ? `, ${firstName}` : ""}!</span> Miss Rev is ready to help you
+            <span className="font-semibold text-fg">Howdy{firstName ? `, ${firstName}` : ""}!</span> HowdyHire is ready to help you
             practice.
           </p>
         </div>
@@ -27,6 +28,7 @@ export function Header() {
       <div className="flex min-w-0 items-center gap-2">
         <ActiveJobPill />
         <SessionStatusBadge status={session.status} />
+        <ThemeToggle />
       </div>
     </header>
   );

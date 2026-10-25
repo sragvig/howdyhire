@@ -7,6 +7,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { StudioStepper } from "@/components/studio/StudioStepper";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,12 +28,32 @@ const display = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "HowdyHire",
-  description: "Behavioral interview studio for Aggies",
+  description: "Aggie-friendly AI Interview Practice",
+  // Tab icons are pre-cropped circular PNGs (`npm run icons` regenerates them from
+  // public/reveille-jr.png); browsers can't clip favicons with CSS. Page mascots still use the
+  // full-res reveille-jr.png. Bump ?v= whenever the icons are regenerated to bust favicon caches.
+  icons: {
+    icon: [
+      { url: "/icons/reveille-circle-32.png?v=3", sizes: "32x32", type: "image/png" },
+      { url: "/icons/reveille-circle-192.png?v=3", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/icons/reveille-circle-32.png?v=3",
+    // Opaque cream background: iOS renders transparent touch-icon pixels as black.
+    apple: [{ url: "/icons/reveille-apple-180.png?v=3", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}>
+    // suppressHydrationWarning: the init script sets data-theme on <html> before React hydrates.
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${display.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full font-sans">
         <ToastProvider>
           <SessionProvider>

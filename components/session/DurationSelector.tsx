@@ -32,7 +32,7 @@ export function DurationSelector() {
             <span className={`flex h-9 w-9 items-center justify-center rounded-full ${selected ? "bg-aggie text-cream-50" : "bg-stone-100 text-stone-500"}`}>
               {demo ? <Sparkles className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
             </span>
-            <span className={`mt-2 font-display text-lg font-bold ${selected ? "text-aggie" : "text-fg"}`}>{d.minutes} min</span>
+            <span className={`mt-2 font-display text-lg font-bold ${selected ? "text-accent" : "text-fg"}`}>{d.minutes} min</span>
             <span className="text-xs text-fg-subtle">~{d.questions} questions</span>
           </button>
         );

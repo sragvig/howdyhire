@@ -53,7 +53,7 @@ export function Tabs({ tabs, initial }: { tabs: TabItem[]; initial?: string }) {
               className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 selected
                   ? "bg-aggie text-cream-50 shadow-sm"
-                  : "border border-stone-200 bg-surface text-fg-muted hover:-translate-y-0.5 hover:border-maroon-200 hover:text-aggie"
+                  : "border border-stone-200 bg-surface text-fg-muted hover:-translate-y-0.5 hover:border-maroon-200 hover:text-accent"
               }`}
             >
               <Icon className="h-4 w-4" />

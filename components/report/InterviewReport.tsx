@@ -61,7 +61,7 @@ function PointCards({ items, tone }: { items: { title: string; detail: string; t
   return (
     <ul className="space-y-3">
       {items.map((item) => (
-        <li key={item.title} className="flex items-start gap-3 rounded-xl bg-cream-200/70 p-3">
+        <li key={item.title} className="flex items-start gap-3 rounded-xl bg-surface-muted p-3">
           <span
             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
               tone === "good" ? "bg-emerald-600 text-white" : "bg-gold-400 text-maroon-900"
@@ -82,7 +82,7 @@ function PointCards({ items, tone }: { items: { title: string; detail: string; t
 
 function StatChip({ label, value }: { label: string; value: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-cream-100 px-3 py-1.5 text-sm">
+    <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-surface-muted px-3 py-1.5 text-sm">
       <span className="text-fg-subtle">{label}</span>
       <span className="font-semibold tabular-nums text-fg">{value}</span>
     </span>
@@ -174,7 +174,7 @@ export function InterviewReport({
           {speech && (
             <section className="space-y-3">
               <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-fg">
-                <Gauge className="h-5 w-5 text-aggie" /> How you sounded
+                <Gauge className="h-5 w-5 text-accent" /> How you sounded
               </h3>
               <DeliveryStats speech={speech} />
             </section>
@@ -205,13 +205,13 @@ export function InterviewReport({
           {transcript && transcript.length > 0 && (
             <details className={`${surface} print:hidden`}>
               <summary className="flex cursor-pointer items-center gap-2 p-5 font-semibold text-fg">
-                <MessagesSquare className="h-5 w-5 text-aggie" /> Full conversation
+                <MessagesSquare className="h-5 w-5 text-accent" /> Full conversation
                 <span className="text-sm font-normal text-fg-subtle">({transcript.length} messages)</span>
               </summary>
               <ol className="space-y-2 border-t border-stone-200 p-5 text-sm">
                 {transcript.map((t) => (
                   <li key={t.id} className="flex gap-3">
-                    <span className={`w-20 shrink-0 text-xs font-semibold ${t.speaker === "candidate" ? "text-fg-subtle" : "text-aggie"}`}>
+                    <span className={`w-20 shrink-0 text-xs font-semibold ${t.speaker === "candidate" ? "text-fg-subtle" : "text-accent"}`}>
                       {t.speaker === "candidate" ? "You" : persona.interviewerName}
                     </span>
                     <span className="text-fg-muted">{t.text}</span>
@@ -248,15 +248,15 @@ export function InterviewReport({
             </div>
           </div>
 
-          {/* Miss Rev's verdict */}
+          {/* Mascot verdict */}
           <div
             className={`flex items-center gap-4 rounded-2xl p-4 lg:w-72 lg:flex-col lg:text-center ${
-              gigEm ? "bg-gold-50 ring-2 ring-gold-300" : "bg-cream-200"
+              gigEm ? "bg-gold-50 ring-2 ring-gold-300" : "bg-surface-muted"
             }`}
           >
             <span className="relative shrink-0">
-              <span className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-cream-50">
-                <Reveille mood={gigEm ? "cheer" : "happy"} size={76} className="translate-y-1.5" />
+              <span className="block rounded-full border-2 border-maroon-800">
+                <Reveille mood={gigEm ? "cheer" : "happy"} size={76} />
               </span>
               {gigEm && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-aggie px-2.5 py-0.5 text-[11px] font-bold text-cream-50">
@@ -265,7 +265,7 @@ export function InterviewReport({
               )}
             </span>
             <div className="min-w-0">
-              <p className="font-display font-bold text-fg">{gigEm ? "Miss Rev approves!" : "Miss Rev's tip"}</p>
+              <p className="font-display font-bold text-fg">{gigEm ? "HowdyHire approves!" : "HowdyHire tip"}</p>
               <p className="mt-0.5 text-sm text-fg-muted">
                 {gigEm ? "You're ready for the real thing. Gig 'em, Ags!" : (growth[0]?.title ?? "Keep practicing your STAR stories!")}
               </p>
@@ -293,7 +293,7 @@ export function InterviewReport({
         <div className="flex flex-col gap-3 rounded-2xl bg-gold-50 p-4 text-sm ring-1 ring-inset ring-gold-200 sm:flex-row sm:items-center print:hidden">
           <AlertTriangle className="h-5 w-5 shrink-0 text-gold-700" />
           <p className="flex-1 text-fg">
-            Miss Rev couldn&apos;t write the full recap ({retryError ?? feedback.reportError}). Your scores below come from the live
+            HowdyHire couldn&apos;t write the full recap ({retryError ?? feedback.reportError}). Your scores below come from the live
             STAR checklist.
           </p>
           {onRetryReport && (

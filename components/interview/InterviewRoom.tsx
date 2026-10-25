@@ -40,7 +40,7 @@ function SetupRequired({ hasResume, hasJob }: { hasResume: boolean; hasJob: bool
                 <span className="block font-semibold text-fg">{label}</span>
                 <span className="block text-sm text-fg-subtle">{done ? "All set!" : detail}</span>
               </span>
-              {!done && <span className="text-sm font-semibold text-aggie transition-transform group-hover:translate-x-0.5">Go →</span>}
+              {!done && <span className="text-sm font-semibold text-accent transition-transform group-hover:translate-x-0.5">Go →</span>}
             </Link>
           </li>
         ))}
@@ -63,14 +63,14 @@ function Room() {
   if (session.status === "scoring") {
     return (
       <div className={`${surface} mx-auto flex min-h-[55vh] max-w-2xl flex-col items-center justify-center p-10 text-center`}>
-        <span className="flex h-36 w-36 animate-bob items-center justify-center overflow-hidden rounded-full bg-cream-200">
-          <Reveille mood="happy" size={130} className="translate-y-2" />
+        <span className="animate-bob rounded-full border-2 border-maroon-800">
+          <Reveille mood="happy" size={136} priority />
         </span>
-        <h1 className="mt-6 font-display text-2xl font-bold text-fg">Miss Rev is putting together your recap…</h1>
+        <h1 className="mt-6 font-display text-2xl font-bold text-fg">HowdyHire is putting together your recap…</h1>
         <p className="mt-2 max-w-md text-fg-muted">Scoring your STAR answers and pacing. This usually takes 10 to 20 seconds.</p>
         <span className="mt-5 flex gap-1.5" aria-hidden>
           {[0, 1, 2].map((i) => (
-            <span key={i} className="h-2 w-2 animate-dot rounded-full bg-aggie" style={{ animationDelay: `${i * 0.15}s` }} />
+            <span key={i} className="h-2 w-2 animate-dot rounded-full bg-aggie dark:bg-maroon-400" style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </span>
       </div>
@@ -157,7 +157,7 @@ function Room() {
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0 space-y-2">
-          <p className="inline-flex items-center gap-2 rounded-full bg-maroon-50 px-3 py-1 text-xs font-semibold text-aggie ring-1 ring-inset ring-maroon-100">
+          <p className="inline-flex items-center gap-2 rounded-full bg-maroon-50 px-3 py-1 text-xs font-semibold text-accent ring-1 ring-inset ring-maroon-100">
             {connected && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-aggie" />}
             {connected ? "Practice session in progress" : "Connecting"}
           </p>

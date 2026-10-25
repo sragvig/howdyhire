@@ -58,8 +58,8 @@ export function StarScorecards({
             </div>
 
             {key === "action" && iPct !== null && (
-              <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-cream-200 px-3 py-1 text-xs font-medium text-fg-muted">
-                “I” statements: <span className="font-bold text-aggie">{iPct}%</span>
+              <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-fg-muted">
+                “I” statements: <span className="font-bold text-accent">{iPct}%</span>
               </p>
             )}
 

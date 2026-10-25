@@ -31,7 +31,7 @@ function StatCard({
   const StatusIcon = status === "watch" ? CircleAlert : CheckCircle2;
   return (
     <div className={`${surface} flex flex-col p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md`}>
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-maroon-50 text-aggie">
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-maroon-50 text-accent">
         <Icon className="h-5 w-5" />
       </span>
       <p className="mt-3 text-xs font-medium text-fg-subtle">{label}</p>
@@ -92,14 +92,14 @@ export function DeliveryStats({ speech }: { speech: SpeechAnalytics }) {
 
       <div className={`${surface} flex flex-wrap items-center gap-2 p-4`}>
         <span className="mr-1 inline-flex items-center gap-1.5 text-sm font-semibold text-fg">
-          <Type className="h-4 w-4 text-aggie" /> {speech.totalWords.toLocaleString()} words spoken
+          <Type className="h-4 w-4 text-accent" /> {speech.totalWords.toLocaleString()} words spoken
         </span>
         {speech.fillers.length === 0 ? (
           <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">No filler words. Gig &apos;em!</span>
         ) : (
           speech.fillers.map((f) => (
-            <span key={f.word} className="rounded-full bg-cream-200 px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-inset ring-stone-200">
-              &ldquo;{f.word}&rdquo; <span className="font-bold text-aggie">×{f.count}</span>
+            <span key={f.word} className="rounded-full bg-surface-muted px-3 py-1 text-xs font-medium text-fg-muted ring-1 ring-inset ring-stone-200">
+              &ldquo;{f.word}&rdquo; <span className="font-bold text-accent">×{f.count}</span>
             </span>
           ))
         )}

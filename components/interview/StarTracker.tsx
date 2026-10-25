@@ -33,7 +33,7 @@ export function StarTracker({ answers }: { answers: AnswerRecord[] }) {
     <Card
       title="STAR checklist"
       icon={<Target />}
-      action={current?.evaluating && <Loader2 className="h-4 w-4 animate-spin text-aggie" aria-label="Checking" />}
+      action={current?.evaluating && <Loader2 className="h-4 w-4 animate-spin text-accent" aria-label="Checking" />}
     >
       <div className="grid grid-cols-2 gap-3">
         {STAR_ELEMENTS.map(({ key, label, hint }) => {

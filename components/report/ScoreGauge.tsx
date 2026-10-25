@@ -7,13 +7,13 @@ export function ScoreGauge({ score }: { score: number }) {
   return (
     <div className="relative h-36 w-36 shrink-0" role="img" aria-label={`STAR score ${score} out of 100`}>
       <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-        <circle cx="60" cy="60" r={r} fill="none" stroke="#ede7da" strokeWidth="10" />
+        <circle cx="60" cy="60" r={r} fill="none" stroke="var(--line)" strokeWidth="10" />
         <circle
           cx="60"
           cy="60"
           r={r}
           fill="none"
-          stroke={score >= 85 ? "#d4af37" : "#500000"}
+          stroke={score >= 85 ? "#d4af37" : "var(--accent-fg)"}
           strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={`${filled} ${circumference}`}
@@ -21,7 +21,7 @@ export function ScoreGauge({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-display text-4xl font-bold leading-none tabular-nums text-aggie">{score}</span>
+        <span className="font-display text-4xl font-bold leading-none tabular-nums text-accent">{score}</span>
         <span className="mt-1 text-xs font-medium text-fg-subtle">STAR score</span>
       </div>
     </div>

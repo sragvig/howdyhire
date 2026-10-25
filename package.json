@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "icons": "node scripts/make-circle-icon.mjs public/reveille-jr.png public/icons/reveille-circle-32.png 32 && node scripts/make-circle-icon.mjs public/reveille-jr.png public/icons/reveille-circle-192.png 192 && node scripts/make-circle-icon.mjs public/reveille-jr.png public/icons/reveille-apple-180.png 180 '#f4e0c9'"
   },
   "dependencies": {
     "@elevenlabs/react": "^1.19.1",

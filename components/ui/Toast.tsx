@@ -22,8 +22,8 @@ const ToastContext = createContext<(toast: ToastInput) => void>(() => {});
 const ICONS = { success: CheckCircle2, info: Info, error: AlertTriangle };
 const ICON_STYLE = {
   success: "bg-emerald-50 text-emerald-700",
-  info: "bg-maroon-50 text-aggie",
-  error: "bg-red-50 text-red-700",
+  info: "bg-maroon-50 text-accent",
+  error: "bg-red-50 text-bad",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {

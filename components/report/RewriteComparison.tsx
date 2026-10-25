@@ -26,7 +26,7 @@ function QuestionCompare({ q, index, interviewerName }: { q: QuestionFeedback; i
   return (
     <li className={`${surface} p-6 print:break-inside-avoid`}>
       <div className="flex items-start gap-4">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon-50 font-display text-sm font-bold text-aggie">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-maroon-50 font-display text-sm font-bold text-accent">
           Q{index + 1}
         </span>
         <div className="min-w-0 flex-1">
@@ -48,11 +48,11 @@ function QuestionCompare({ q, index, interviewerName }: { q: QuestionFeedback; i
             ))}
           </div>
         </div>
-        <span className="rounded-full bg-cream-200 px-3 py-1 font-display text-lg font-bold tabular-nums text-aggie">{score}</span>
+        <span className="rounded-full bg-surface-muted px-3 py-1 font-display text-lg font-bold tabular-nums text-accent">{score}</span>
       </div>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl bg-cream-200 p-5">
+        <div className="rounded-2xl bg-surface-muted p-5">
           <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-fg-subtle">
             <UserRound className="h-3.5 w-3.5" /> What you said
           </p>
@@ -83,7 +83,7 @@ function QuestionCompare({ q, index, interviewerName }: { q: QuestionFeedback; i
         <div className="mt-4 flex flex-wrap gap-2">
           {q.coachingNote && (
             <p className="flex w-full items-start gap-2 rounded-xl bg-maroon-50 px-3 py-2 text-sm text-fg">
-              <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-aggie" /> {q.coachingNote}
+              <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-accent" /> {q.coachingNote}
             </p>
           )}
           {q.strengths.map((s) => (
