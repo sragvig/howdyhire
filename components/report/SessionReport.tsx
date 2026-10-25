@@ -25,9 +25,9 @@ export function SessionReport() {
         durationMinutes: session.config.durationMinutes,
       }}
       actions={[
-        { label: "Try again", icon: RotateCcw, onClick: reset, primary: true },
+        { label: "Practice again", icon: RotateCcw, onClick: reset, primary: true },
         {
-          label: "New interview",
+          label: "Try a new role",
           icon: Sparkles,
           onClick: () => {
             reset();

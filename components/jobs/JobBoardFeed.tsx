@@ -80,15 +80,15 @@ export function JobBoardFeed() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-display text-lg font-semibold text-fg">Aggie Job Board</h2>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="inline-flex rounded-xl border border-line bg-white/5 p-1">
+            <div className="inline-flex rounded-full border border-stone-200 bg-surface p-1 shadow-sm">
               {FILTERS.map((f) => (
                 <button
                   key={f.id}
                   type="button"
                   onClick={() => setFilter(f.id)}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-300 ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300 ${
                     filter === f.id
-                      ? "bg-gradient-to-b from-maroon-600 to-aggie text-white shadow-md shadow-maroon-900/50"
+                      ? "bg-aggie text-cream-50"
                       : "text-fg-muted hover:text-fg"
                   }`}
                 >

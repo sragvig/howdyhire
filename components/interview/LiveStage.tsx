@@ -1,67 +1,46 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { Reveille } from "@/components/mascot/Reveille";
 
-const BAR_COUNT = 40;
-const IDLE = 0.06;
-
-// The live "stage": a pulsing maroon halo around the interviewer plus a mirrored waveform, both
-// driven straight from the audio graph each frame (no React re-renders).
+// The live stage: Miss Rev listens along. A soft gold ring breathes gently with the audio level;
+// no bars, glows, or gradients.
 export function LiveStage({
   active,
   speaking,
+  connecting,
   getInput,
   getOutput,
-  initial,
-  name,
-  subtitle,
+  interviewerName,
+  interviewerLabel,
   children,
 }: {
   active: boolean; // connected
-  speaking: boolean; // interviewer is talking (otherwise the candidate's mic drives it)
+  speaking: boolean; // interviewer is talking
+  connecting: boolean;
   getInput: () => Uint8Array;
   getOutput: () => Uint8Array;
-  initial: string;
-  name: string;
-  subtitle: string;
+  interviewerName: string;
+  interviewerLabel: string;
   children?: ReactNode;
 }) {
-  const orb = useRef<HTMLDivElement>(null);
-  const bars = useRef<(HTMLSpanElement | null)[]>([]);
+  const ring = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const setBars = (scaleFor: (i: number) => number) =>
-      bars.current.forEach((bar, i) => {
-        if (bar) bar.style.transform = `scaleY(${scaleFor(i)})`;
-      });
-
     if (!active) {
-      orb.current?.style.setProperty("--level", "0");
-      setBars(() => IDLE);
+      if (ring.current) ring.current.style.transform = "scale(1)";
       return;
     }
-
     let frame = 0;
     let level = 0;
-    const half = BAR_COUNT / 2;
     const tick = () => {
       const data = speaking ? getOutput() : getInput();
       if (data.length > 0) {
-        // Overall loudness for the halo, eased so it breathes rather than flickers.
         let total = 0;
         const voiced = Math.floor(data.length * 0.6);
         for (let j = 0; j < voiced; j++) total += data[j];
-        const target = Math.min(1, (total / voiced / 255) * 1.8);
-        level += (target - level) * 0.2;
-        orb.current?.style.setProperty("--level", level.toFixed(3));
-
-        const bucket = Math.max(1, Math.floor(data.length / half));
-        setBars((i) => {
-          const k = i < half ? half - 1 - i : i - half; // mirror around the center
-          let sum = 0;
-          for (let j = k * bucket; j < (k + 1) * bucket && j < data.length; j++) sum += data[j];
-          return IDLE + Math.min(1, (sum / bucket / 255) * 1.5) * (1 - IDLE);
-        });
+        level += (Math.min(1, (total / voiced / 255) * 1.8) - level) * 0.15;
+        if (ring.current) ring.current.style.transform = `scale(${1 + level * 0.12})`;
       }
       frame = requestAnimationFrame(tick);
     };
@@ -69,66 +48,43 @@ export function LiveStage({
     return () => cancelAnimationFrame(frame);
   }, [active, speaking, getInput, getOutput]);
 
-  // Interviewer voice glows maroon; the candidate's voice glows gold.
-  const ring = speaking ? "border-maroon-400/70" : "border-gold-400/60";
-  const glow = speaking ? "184 49 49" : "212 175 55";
+  const status = connecting
+    ? "Miss Rev is getting things ready"
+    : !active
+      ? "Miss Rev is ready when you are"
+      : speaking
+        ? `${interviewerName} is asking`
+        : "Miss Rev is listening";
 
   return (
-    <div className="flex flex-col items-center">
-      <div ref={orb} className="relative flex h-48 w-48 items-center justify-center" style={{ ["--level" as string]: 0 }}>
-        {/* idle breathing halo while connected */}
-        {active && <span className={`absolute inset-6 animate-halo rounded-full border-2 ${ring}`} aria-hidden />}
-        {/* level-reactive rings */}
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            aria-hidden
-            className={`absolute inset-8 rounded-full border ${active ? ring : "border-white/10"} transition-colors duration-500`}
-            style={{
-              transform: `scale(calc(1 + var(--level) * ${0.28 + i * 0.22}))`,
-              opacity: active ? `calc(${0.55 - i * 0.15} + var(--level) * 0.35)` : 0.4 - i * 0.12,
-            }}
-          />
-        ))}
-        <div
-          className="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-maroon-500 via-maroon-700 to-maroon-950 font-display text-4xl font-extrabold text-white ring-1 ring-inset ring-white/20 transition-shadow duration-300"
-          style={{
-            boxShadow: active
-              ? `0 0 calc(24px + var(--level) * 70px) rgb(${glow} / calc(0.35 + var(--level) * 0.45)), inset 0 2px 12px rgb(255 255 255 / 0.15)`
-              : "0 10px 40px rgb(80 0 0 / 0.5), inset 0 2px 12px rgb(255 255 255 / 0.12)",
-          }}
-        >
-          {initial}
-          {active && (
-            <span
-              className={`absolute bottom-2 right-2 h-3.5 w-3.5 rounded-full ring-2 ring-maroon-950 ${speaking ? "bg-maroon-300" : "bg-gold-400"}`}
-              aria-hidden
-            />
-          )}
-        </div>
+    <div className="flex flex-col items-center text-center">
+      <div className="relative flex h-44 w-44 items-center justify-center">
+        {active && !speaking && <span aria-hidden className="absolute inset-3 animate-soft-ping rounded-full bg-gold-200" />}
+        <span
+          ref={ring}
+          aria-hidden
+          className={`absolute inset-3 rounded-full border-4 transition-colors duration-300 ${
+            active ? (speaking ? "border-maroon-200" : "border-gold-300") : "border-stone-200"
+          }`}
+        />
+        <span className={`relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-cream-200 ${active ? "animate-bob" : ""}`}>
+          <Reveille mood={active && !speaking ? "listening" : "happy"} size={120} className="translate-y-2" />
+        </span>
       </div>
 
-      <p className="mt-1 font-display text-lg font-bold text-fg">{name}</p>
-      <p className="text-xs text-fg-subtle">{subtitle}</p>
-
-      <div className="mt-4 flex h-16 w-full max-w-md items-center justify-center gap-[3px]" aria-hidden>
-        {Array.from({ length: BAR_COUNT }, (_, i) => (
-          <span
-            key={i}
-            ref={(el) => {
-              bars.current[i] = el;
-            }}
-            className={`h-full w-1 origin-center rounded-full transition-[background-color] duration-500 ${
-              !active
-                ? "bg-white/15"
-                : speaking
-                  ? "bg-gradient-to-t from-maroon-700 via-maroon-400 to-maroon-200"
-                  : "bg-gradient-to-t from-gold-600 via-gold-400 to-gold-200"
-            }`}
-            style={{ transform: `scaleY(${IDLE})` }}
-          />
-        ))}
-      </div>
+      <span className="mt-1 inline-flex items-center gap-2 rounded-full bg-surface px-4 py-1.5 text-sm font-semibold text-fg shadow-sm ring-1 ring-stone-200" aria-live="polite">
+        {status}
+        {(active || connecting) && (
+          <span className="flex gap-0.5" aria-hidden>
+            {[0, 1, 2].map((i) => (
+              <span key={i} className="h-1.5 w-1.5 animate-dot rounded-full bg-aggie" style={{ animationDelay: `${i * 0.15}s` }} />
+            ))}
+          </span>
+        )}
+      </span>
+      <p className="mt-2 text-xs text-fg-subtle">
+        Interviewing with <span className="font-semibold text-fg-muted">{interviewerName}</span> · {interviewerLabel}
+      </p>
 
       {children}
     </div>

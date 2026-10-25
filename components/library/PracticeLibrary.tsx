@@ -75,8 +75,8 @@ function SessionCard({ entry }: { entry: PastInterview }) {
         </dl>
 
         <div className="mt-auto flex items-center justify-between border-t border-line pt-4">
-          <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent">
-            View scorecard <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          <span className="inline-flex items-center gap-1 text-sm font-semibold text-aggie">
+            See recap <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </span>
           <button
             type="button"
@@ -111,12 +111,12 @@ export function PracticeLibrary() {
       {!hydrated ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-busy>
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-56 animate-pulse rounded-2xl bg-white/5" />
+            <div key={i} className="h-56 animate-pulse rounded-2xl bg-stone-200/60" />
           ))}
         </div>
       ) : entries.length === 0 ? (
         <div className={`${surface} flex flex-col items-center p-12 text-center`}>
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-maroon-500/15 text-accent ring-1 ring-inset ring-maroon-400/25">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-50 text-aggie ring-1 ring-inset ring-maroon-100">
             <Library className="h-7 w-7" />
           </span>
           <h2 className="mt-4 font-display text-lg font-semibold text-fg">No interviews yet</h2>

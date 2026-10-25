@@ -32,11 +32,7 @@ export function Tabs({ tabs, initial }: { tabs: TabItem[]; initial?: string }) {
 
   return (
     <div>
-      <div
-        role="tablist"
-        aria-label="Report sections"
-        className="flex gap-1 overflow-x-auto rounded-2xl border border-line bg-surface p-1 shadow-xl shadow-black/20 backdrop-blur-md print:hidden"
-      >
+      <div role="tablist" aria-label="Recap sections" className="flex gap-2 overflow-x-auto pb-1 print:hidden">
         {tabs.map((tab, i) => {
           const selected = tab.id === active;
           const Icon = tab.icon;
@@ -54,13 +50,13 @@ export function Tabs({ tabs, initial }: { tabs: TabItem[]; initial?: string }) {
               tabIndex={selected ? 0 : -1}
               onClick={() => setActive(tab.id)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`flex shrink-0 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
+              className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                 selected
-                  ? "bg-gradient-to-b from-maroon-600 to-aggie text-white shadow-lg shadow-maroon-900/50 ring-1 ring-inset ring-white/15"
-                  : "text-fg-muted hover:bg-white/5 hover:text-fg"
+                  ? "bg-aggie text-cream-50 shadow-sm"
+                  : "border border-stone-200 bg-surface text-fg-muted hover:-translate-y-0.5 hover:border-maroon-200 hover:text-aggie"
               }`}
             >
-              <Icon className={`h-4 w-4 ${selected ? "text-gold-300" : ""}`} />
+              <Icon className="h-4 w-4" />
               {tab.label}
             </button>
           );

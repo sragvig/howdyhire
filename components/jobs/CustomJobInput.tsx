@@ -48,8 +48,8 @@ export function CustomJobInput({
         setMode(m);
         setError(null);
       }}
-      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-300 ${
-        mode === m ? "bg-gradient-to-b from-maroon-600 to-aggie text-white shadow-md shadow-maroon-900/50" : "text-fg-muted hover:text-fg"
+      className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300 ${
+        mode === m ? "bg-aggie text-cream-50" : "text-fg-muted hover:text-fg"
       }`}
     >
       <Icon className="h-4 w-4" /> {label}
@@ -58,7 +58,7 @@ export function CustomJobInput({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="inline-flex rounded-xl border border-line bg-white/5 p-1">
+      <div className="inline-flex rounded-full border border-stone-200 bg-surface p-1 shadow-sm">
         {tab("url", "Paste URL", Link2)}
         {tab("text", "Paste description", TextCursorInput)}
       </div>

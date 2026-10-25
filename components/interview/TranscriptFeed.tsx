@@ -13,12 +13,12 @@ export function TranscriptFeed({ entries, interviewerName }: { entries: Transcri
   }, [entries]);
 
   return (
-    <Card title="Live transcript" icon={<MessageSquareText />}>
+    <Card title="Conversation" icon={<MessageSquareText />}>
       <div ref={scroller} className="h-80 space-y-3 overflow-y-auto pr-1" aria-live="polite">
         {entries.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <MessageSquareText className="h-8 w-8 text-fg-subtle/50" />
-            <p className="mt-2 text-sm text-fg-subtle">The conversation will appear here as you speak.</p>
+            <MessageSquareText className="h-8 w-8 text-stone-300" />
+            <p className="mt-2 text-sm text-fg-subtle">Your conversation will show up here as you talk.</p>
           </div>
         ) : (
           entries.map((e) => {
@@ -27,12 +27,10 @@ export function TranscriptFeed({ entries, interviewerName }: { entries: Transcri
               <div key={e.id} className={`flex animate-fade-up ${isCandidate ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                    isCandidate
-                      ? "rounded-br-md bg-gradient-to-br from-maroon-600 to-aggie text-white shadow-lg shadow-maroon-950/40"
-                      : "rounded-bl-md border border-line bg-white/5 text-fg"
+                    isCandidate ? "rounded-br-md bg-aggie text-cream-50" : "rounded-bl-md bg-cream-200 text-fg"
                   }`}
                 >
-                  <p className={`mb-0.5 text-[11px] font-semibold uppercase tracking-wider ${isCandidate ? "text-maroon-200" : "text-gold"}`}>
+                  <p className={`mb-0.5 text-[11px] font-semibold ${isCandidate ? "text-maroon-200" : "text-aggie"}`}>
                     {isCandidate ? "You" : interviewerName}
                   </p>
                   {e.text}

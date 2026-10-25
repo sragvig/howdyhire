@@ -1,28 +1,19 @@
 "use client";
 
+import { Clock, Sparkles } from "lucide-react";
 import { DURATIONS } from "@/lib/durations";
 import { useSession } from "@/components/providers/SessionProvider";
+import { choiceCard } from "@/components/ui/styles";
 
-// Segmented control with a sliding highlight behind the active option.
 export function DurationSelector() {
   const { session, updateConfig } = useSession();
   const disabled = session.status !== "idle";
-  const index = Math.max(0, DURATIONS.findIndex((d) => d.minutes === session.config.durationMinutes));
 
   return (
-    <div
-      role="radiogroup"
-      aria-label="Interview length"
-      className="relative grid rounded-2xl border border-line bg-white/5 p-1 backdrop-blur-md"
-      style={{ gridTemplateColumns: `repeat(${DURATIONS.length}, minmax(0, 1fr))` }}
-    >
-      <span
-        aria-hidden
-        className="absolute inset-y-1 left-1 rounded-xl bg-gradient-to-b from-maroon-600 to-aggie shadow-lg shadow-maroon-900/50 ring-1 ring-inset ring-white/15 transition-transform duration-300 ease-out"
-        style={{ width: `calc((100% - 0.5rem) / ${DURATIONS.length})`, transform: `translateX(${index * 100}%)` }}
-      />
-      {DURATIONS.map((d, i) => {
-        const selected = i === index;
+    <div role="radiogroup" aria-label="Session length" className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      {DURATIONS.map((d) => {
+        const selected = session.config.durationMinutes === d.minutes;
+        const demo = d.minutes === 2;
         return (
           <button
             key={d.minutes}
@@ -31,16 +22,18 @@ export function DurationSelector() {
             aria-checked={selected}
             disabled={disabled}
             onClick={() => updateConfig({ durationMinutes: d.minutes, questionCount: d.questions })}
-            className={`relative z-10 flex flex-col items-center rounded-xl px-1 py-2 text-center transition-colors duration-300 disabled:cursor-not-allowed ${
-              selected ? "text-white" : "text-fg-muted hover:text-fg"
-            }`}
+            className={`${choiceCard(selected)} flex flex-col items-center px-3 py-4 text-center`}
           >
-            <span className="text-sm font-semibold">
-              {d.minutes === 2 ? "Demo · 2m" : `${d.minutes}m`}
+            {demo && (
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-gold-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-maroon-900">
+                Demo
+              </span>
+            )}
+            <span className={`flex h-9 w-9 items-center justify-center rounded-full ${selected ? "bg-aggie text-cream-50" : "bg-stone-100 text-stone-500"}`}>
+              {demo ? <Sparkles className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
             </span>
-            <span className={`hidden text-[11px] sm:block ${selected ? "text-maroon-100" : "text-fg-subtle"}`}>
-              ~{d.questions} questions
-            </span>
+            <span className={`mt-2 font-display text-lg font-bold ${selected ? "text-aggie" : "text-fg"}`}>{d.minutes} min</span>
+            <span className="text-xs text-fg-subtle">~{d.questions} questions</span>
           </button>
         );
       })}

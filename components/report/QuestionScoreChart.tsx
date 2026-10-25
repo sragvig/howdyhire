@@ -23,7 +23,7 @@ export function QuestionScoreChart({ questions }: { questions: QuestionFeedback[
           {GRID.map((g) => (
             <div
               key={g}
-              className={`absolute inset-x-0 border-t ${g === 0 ? "border-line-strong" : "border-dashed border-line"}`}
+              className={`absolute inset-x-0 border-t ${g === 0 ? "border-stone-300" : "border-dashed border-stone-200"}`}
               style={{ bottom: `${g}%` }}
             />
           ))}
@@ -39,10 +39,10 @@ export function QuestionScoreChart({ questions }: { questions: QuestionFeedback[
                   aria-label={`Question ${i + 1}: ${score} out of 100`}
                 >
                   <div
-                    className="w-full max-w-10 rounded-t-md bg-gradient-to-t from-maroon-800 to-maroon-500 transition-all duration-300 group-hover:from-maroon-700 group-hover:to-maroon-300 group-hover:shadow-lg group-hover:shadow-maroon-700/40 group-focus-visible:to-maroon-300"
+                    className="w-full max-w-10 rounded-t-lg bg-aggie transition-colors duration-200 group-hover:bg-maroon-600 group-focus-visible:bg-maroon-600"
                     style={{ height: `${Math.max(score, 1)}%` }}
                   />
-                  <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-56 -translate-x-1/2 rounded-xl border border-line bg-surface-strong p-3 text-xs shadow-2xl shadow-black/50 group-hover:block group-focus-visible:block">
+                  <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-56 -translate-x-1/2 rounded-xl border border-stone-200 bg-surface p-3 text-xs shadow-lg group-hover:block group-focus-visible:block">
                     <p className="font-semibold text-fg">
                       Q{i + 1} · {score}/100
                     </p>

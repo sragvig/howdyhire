@@ -30,7 +30,7 @@ function ResumeSummary({ resume }: { resume: ResumeData }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-maroon-500 to-aggie font-display text-xl font-extrabold text-white ring-1 ring-inset ring-white/20">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-aggie font-display text-xl font-bold text-cream-50">
           {resume.candidateName
             .split(" ")
             .map((p) => p[0])
@@ -53,7 +53,7 @@ function ResumeSummary({ resume }: { resume: ResumeData }) {
         <ul className="space-y-3 border-l border-line pl-4">
           {resume.experience.map((e) => (
             <li key={e.id} className="relative text-sm">
-              <span className="absolute -left-[1.3rem] top-1.5 h-2 w-2 rounded-full bg-gold-400 ring-4 ring-canvas" />
+              <span className="absolute -left-[1.3rem] top-1.5 h-2 w-2 rounded-full bg-gold-400 ring-4 ring-surface" />
               <p className="font-medium text-fg">
                 {e.role} <span className="text-fg-subtle">·</span> <span className="text-fg-muted">{e.organization}</span>
               </p>
@@ -175,11 +175,11 @@ export function ResumeUpload() {
           }}
           className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-all duration-300 ${
             dragging
-              ? "border-gold-400/70 bg-gold-400/5"
-              : "border-line-strong hover:border-maroon-400/50 hover:bg-maroon-500/5"
+              ? "border-gold-400 bg-gold-50"
+              : "border-stone-300 hover:border-maroon-300 hover:bg-maroon-50/50"
           }`}
         >
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-maroon-500/15 text-accent ring-1 ring-inset ring-maroon-400/25">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-maroon-50 text-aggie ring-1 ring-inset ring-maroon-100">
             {loading ? <Loader2 className="h-7 w-7 animate-spin" /> : <Upload className="h-7 w-7" />}
           </span>
           <p className="mt-4 font-medium text-fg">{loading ? "Parsing with Gemini…" : "Drop a PDF or .txt, or click to browse"}</p>

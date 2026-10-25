@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
-import { AlertTriangle, CheckCircle2, Info, ThumbsUp, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
+import { RevAvatar } from "@/components/mascot/Reveille";
 
 type Tone = "success" | "info" | "error" | "gigem";
 
@@ -18,12 +19,11 @@ interface ToastItem extends ToastInput {
 
 const ToastContext = createContext<(toast: ToastInput) => void>(() => {});
 
-const ICONS = { success: CheckCircle2, info: Info, error: AlertTriangle, gigem: ThumbsUp };
-const ICON_STYLE: Record<Tone, string> = {
-  success: "bg-emerald-500/15 text-good",
-  info: "bg-maroon-500/20 text-accent",
-  error: "bg-red-500/15 text-bad",
-  gigem: "bg-gold-400/15 text-gold",
+const ICONS = { success: CheckCircle2, info: Info, error: AlertTriangle };
+const ICON_STYLE = {
+  success: "bg-emerald-50 text-emerald-700",
+  info: "bg-maroon-50 text-aggie",
+  error: "bg-red-50 text-red-700",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -56,16 +56,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       >
         {toasts.map((t) => {
           const tone = t.tone ?? "info";
-          const Icon = ICONS[tone];
           return (
             <div
               key={t.id}
               role="status"
-              className="pointer-events-auto flex w-full max-w-sm animate-toast-in items-start gap-3 rounded-2xl border border-line bg-surface-strong/90 p-3.5 shadow-2xl shadow-black/40 backdrop-blur-md"
+              className="pointer-events-auto flex w-full max-w-sm animate-toast-in items-start gap-3 rounded-2xl border border-stone-200 bg-surface p-3.5 shadow-lg"
             >
-              <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${ICON_STYLE[tone]}`}>
-                <Icon className="h-4 w-4" />
-              </span>
+              {tone === "gigem" ? (
+                <RevAvatar mood="cheer" size={36} ring={false} />
+              ) : (
+                (() => {
+                  const Icon = ICONS[tone];
+                  return (
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${ICON_STYLE[tone]}`}>
+                      <Icon className="h-4 w-4" />
+                    </span>
+                  );
+                })()
+              )}
               <div className="min-w-0 flex-1 pt-0.5">
                 <p className="text-sm font-semibold text-fg">{t.title}</p>
                 {t.description && <p className="mt-0.5 text-xs text-fg-muted">{t.description}</p>}
@@ -74,7 +82,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={() => dismiss(t.id)}
                 aria-label="Dismiss notification"
-                className="rounded-lg p-1 text-fg-subtle transition-colors hover:bg-white/10 hover:text-fg"
+                className="rounded-lg p-1 text-fg-subtle transition-colors hover:bg-stone-100 hover:text-fg"
               >
                 <X className="h-3.5 w-3.5" />
               </button>

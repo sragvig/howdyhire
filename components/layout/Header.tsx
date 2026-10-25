@@ -3,6 +3,7 @@
 import { useSession } from "@/components/providers/SessionProvider";
 import { SessionStatusBadge } from "@/components/session/SessionStatusBadge";
 import { ActiveJobPill } from "@/components/studio/ActiveJobPill";
+import { RevAvatar } from "@/components/mascot/Reveille";
 import { Logo } from "./Sidebar";
 
 export function Header() {
@@ -10,21 +11,18 @@ export function Header() {
   const firstName = session.resume?.candidateName.split(" ")[0];
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-line bg-canvas/70 px-4 backdrop-blur-md sm:px-8 print:hidden">
+    <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-3 border-b border-stone-200 bg-canvas/95 px-4 sm:px-8 print:hidden">
       <div className="flex min-w-0 items-center gap-3">
         <div className="md:hidden">
-          <Logo compact />
+          <Logo onMaroon={false} />
         </div>
-        <p className="hidden truncate text-sm text-fg-muted sm:block">
-          {firstName ? (
-            <>
-              Howdy, <span className="font-semibold text-fg">{firstName}</span>
-              <span className="text-gold">!</span>
-            </>
-          ) : (
-            "Howdy! Let's get you interview-ready."
-          )}
-        </p>
+        <div className="hidden items-center gap-3 sm:flex">
+          <RevAvatar size={40} />
+          <p className="truncate text-sm text-fg-muted">
+            <span className="font-semibold text-fg">Howdy{firstName ? `, ${firstName}` : ""}!</span> Miss Rev is ready to help you
+            practice.
+          </p>
+        </div>
       </div>
       <div className="flex min-w-0 items-center gap-2">
         <ActiveJobPill />
