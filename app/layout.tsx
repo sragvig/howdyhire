@@ -52,7 +52,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/* Plain inline script (not next/script) so it runs before first paint; React doesn't
+            execute or reconcile its contents on the client, so skip the hydration comparison. */}
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="min-h-full font-sans">
         <ToastProvider>
