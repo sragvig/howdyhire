@@ -1,10 +1,10 @@
 import type { AnswerRecord, Feedback, StarElement, StarEvaluation } from "@/types";
 
-export const STAR_ELEMENTS: { key: StarElement; label: string; hint: string }[] = [
-  { key: "situation", label: "Situation", hint: "Set the scene: where, when, who" },
-  { key: "task", label: "Task", hint: "Your responsibility or goal" },
-  { key: "action", label: "Action", hint: "What you specifically did" },
-  { key: "result", label: "Result", hint: "The outcome, ideally measurable" },
+export const STAR_ELEMENTS: { key: StarElement; label: string; hint: string; criterion: string }[] = [
+  { key: "situation", label: "Situation", hint: "Set the scene: where, when, who", criterion: "Clarity & context setting" },
+  { key: "task", label: "Task", hint: "Your responsibility or goal", criterion: "Problem & responsibility definition" },
+  { key: "action", label: "Action", hint: "What you specifically did", criterion: "Specific personal contributions (I vs. We)" },
+  { key: "result", label: "Result", hint: "The outcome, ideally measurable", criterion: "Quantifiable outcomes & lessons learned" },
 ];
 
 export function missingElements(evaluation: StarEvaluation): StarElement[] {

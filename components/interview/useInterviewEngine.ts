@@ -2,10 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useConversation } from "@elevenlabs/react";
-import type { AnswerRecord, InterviewerPersona, StarEvaluation, TranscriptEntry } from "@/types";
+import type { AnswerRecord, Feedback, InterviewerPersona, StarEvaluation, TranscriptEntry } from "@/types";
 import { useSession } from "@/components/providers/SessionProvider";
-import { buildAgentPrompt, buildFirstMessage, missingElementsNote, personaSwitchNote } from "@/lib/interview-prompt";
+import {
+  TIME_UP_NOTE,
+  buildAgentPrompt,
+  buildDynamicVariables,
+  buildFirstMessage,
+  missingElementsNote,
+  personaSwitchNote,
+  timeWarningNote,
+} from "@/lib/interview-prompt";
+import { WRAP_UP_GRACE_MS, warningLeadMs } from "@/lib/durations";
 import { buildFeedback, missingElements } from "@/lib/star";
+import { getPersona } from "@/lib/personas";
+import { detectStarCues } from "@/lib/star-heuristics";
+import { analyzeSpeech } from "@/lib/speech-analytics";
+import { cleanTranscriptText } from "@/lib/transcript-clean";
 import { requestReport } from "@/lib/report-client";
 
 export type MicPermission = "unknown" | "granted" | "denied" | "unavailable";
@@ -19,15 +32,31 @@ export function useInterviewEngine() {
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [mic, setMic] = useState<MicPermission>("unknown");
   const [error, setError] = useState<string | null>(null);
+  // True between clicking Start and the SDK taking over (mic prompt + signed URL fetch).
+  const [preparing, setPreparing] = useState(false);
+  // The persona whose voice and name the agent was started with; mid-call switches only change style.
+  const [callPersona, setCallPersona] = useState<InterviewerPersona | null>(null);
+
+  // Interview clock: started on connect, ticked once a second while connected.
+  const [callStartedAt, setCallStartedAt] = useState<number | null>(null);
+  const [limitMs, setLimitMs] = useState(0);
+  const [now, setNow] = useState(0);
+  const timeNotes = useRef({ warned: false, timeUp: false, ended: false });
 
   // Refs hold the source of truth for values read inside SDK callbacks and async work,
   // where render-time state would be stale.
   const answersRef = useRef<AnswerRecord[]>([]);
+  const transcriptRef = useRef<TranscriptEntry[]>([]);
   const sessionRef = useRef(session);
   const pendingEvals = useRef(new Set<Promise<void>>());
   const evalSeq = useRef(new Map<string, number>());
   const lastNudge = useRef(new Map<string, string>());
   const finishing = useRef(false);
+
+  // Speaking-time bookkeeping for the pace metric. Voice-activity (VAD) events give actual speech
+  // time when the agent sends them; otherwise fall back to the window between the interviewer
+  // finishing and the candidate's transcript arriving (includes thinking pauses).
+  const timing = useRef({ listeningSince: 0, lastMessageAt: 0, turnMs: 0, vadMs: 0, vadEvents: 0, lastVadAt: 0 });
 
   useEffect(() => {
     sessionRef.current = session;
@@ -44,8 +73,13 @@ export function useInterviewEngine() {
     [commitAnswers],
   );
 
+  const updateTranscript = (fn: (prev: TranscriptEntry[]) => TranscriptEntry[]) => {
+    transcriptRef.current = fn(transcriptRef.current);
+    setTranscript(transcriptRef.current);
+  };
+
   const appendTranscript = (speaker: TranscriptEntry["speaker"], text: string) =>
-    setTranscript((prev) => [...prev, { id: newId(), speaker, text, at: new Date().toISOString() }]);
+    updateTranscript((prev) => [...prev, { id: newId(), speaker, text, at: new Date().toISOString() }]);
 
   const finish = useCallback(async () => {
     if (sessionRef.current.status !== "active" || finishing.current) return;
@@ -54,7 +88,17 @@ export function useInterviewEngine() {
     await Promise.allSettled([...pendingEvals.current]);
 
     // Local STAR scores always exist; the AI report is layered on top when it succeeds.
-    let feedback = buildFeedback(answersRef.current);
+    const t = timing.current;
+    const useVad = t.vadEvents >= 20 && t.vadMs > 0;
+    let feedback: Feedback = {
+      ...buildFeedback(answersRef.current),
+      speech: analyzeSpeech(
+        answersRef.current.map((a) => a.answer).filter(Boolean),
+        useVad ? t.vadMs : t.turnMs,
+        useVad ? "voice-activity" : "turn-timing",
+      ),
+      transcript: transcriptRef.current,
+    };
     if (feedback.questions.length > 0) {
       try {
         feedback = await requestReport(feedback, sessionRef.current);
@@ -67,22 +111,43 @@ export function useInterviewEngine() {
   }, [beginScoring, complete]);
 
   const conversation = useConversation({
-    onConnect: () => start(),
+    onConnect: () => {
+      start();
+      timeNotes.current = { warned: false, timeUp: false, ended: false };
+      const t = Date.now();
+      setCallStartedAt(t);
+      setNow(t);
+    },
     onMessage: ({ message, role }) => {
-      if (!message.trim()) return;
-      if (role === "agent") handleInterviewerTurn(message);
-      else handleCandidateTurn(message);
+      // Clean once here so both the transcript and every Gemini request get tag-free text.
+      const text = cleanTranscriptText(message);
+      if (!text) return;
+      if (role === "agent") handleInterviewerTurn(text);
+      else handleCandidateTurn(text);
     },
     // When the candidate interrupts, ElevenLabs sends the truncated text the agent actually spoke.
     onAgentResponseCorrection: ({ original_agent_response, corrected_agent_response }) =>
-      setTranscript((prev) => {
-        const idx = prev.findLastIndex((t) => t.speaker === "interviewer" && t.text === original_agent_response);
+      updateTranscript((prev) => {
+        const original = cleanTranscriptText(original_agent_response);
+        const idx = prev.findLastIndex((t) => t.speaker === "interviewer" && t.text === original);
         if (idx === -1) return prev;
         const next = [...prev];
-        next[idx] = { ...next[idx], text: corrected_agent_response };
+        next[idx] = { ...next[idx], text: cleanTranscriptText(corrected_agent_response) };
         return next;
       }),
+    onModeChange: ({ mode }) => {
+      if (mode === "listening") timing.current.listeningSince = Date.now();
+    },
+    onVadScore: ({ vadScore }) => {
+      const t = timing.current;
+      const now = Date.now();
+      // Cap each gap so a stalled event stream doesn't count as speech.
+      if (t.lastVadAt && vadScore >= 0.5) t.vadMs += Math.min(now - t.lastVadAt, 500);
+      t.lastVadAt = now;
+      t.vadEvents++;
+    },
     onDisconnect: (details) => {
+      setCallStartedAt(null);
       if (details.reason === "error") setError(details.message || "The connection dropped.");
       void finish();
     },
@@ -147,6 +212,7 @@ export function useInterviewEngine() {
 
   // Consecutive interviewer messages belong to the same question until the candidate replies.
   function handleInterviewerTurn(text: string) {
+    timing.current.lastMessageAt = Date.now();
     appendTranscript("interviewer", text);
     const list = answersRef.current;
     const last = list.at(-1);
@@ -158,32 +224,90 @@ export function useInterviewEngine() {
   }
 
   // Every candidate turn re-evaluates the whole answer so far, so badges accumulate.
+  // Heuristic cues light badges instantly; Gemini confirms or corrects them a moment later.
   function handleCandidateTurn(text: string) {
+    const t = timing.current;
+    const now = Date.now();
+    const turnStart = Math.max(t.listeningSince, t.lastMessageAt);
+    if (turnStart) t.turnMs += now - turnStart;
+    t.lastMessageAt = now;
     appendTranscript("candidate", text);
     const list = answersRef.current;
     const last = list.at(-1);
+    const answer = last ? `${last.answer} ${text}`.trim() : text;
     const updated: AnswerRecord = last
-      ? { ...last, answer: `${last.answer} ${text}`.trim() }
-      : { id: newId(), question: "", answer: text, evaluating: false };
+      ? { ...last, answer, heuristic: detectStarCues(answer) }
+      : { id: newId(), question: "", answer, heuristic: detectStarCues(answer), evaluating: false };
     commitAnswers(last ? [...list.slice(0, -1), updated] : [...list, updated]);
     evaluate(updated);
   }
 
+  async function fetchSignedUrl(): Promise<string> {
+    let res: Response;
+    try {
+      res = await fetch("/api/elevenlabs/signed-url", { cache: "no-store" });
+    } catch {
+      throw new Error("Couldn't reach the server to start the interview. Check your connection and try again.");
+    }
+    const data = await res.json().catch(() => null);
+    if (!res.ok || typeof data?.signedUrl !== "string") {
+      throw new Error(data?.error ?? "Couldn't start the voice session. Try again.");
+    }
+    return data.signedUrl;
+  }
+
   async function startInterview() {
+    if (preparing) return;
     setError(null);
     const { resume, job, config } = sessionRef.current;
     if (!resume || !job) return;
 
-    const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
-    if (!agentId) {
-      setError("NEXT_PUBLIC_ELEVENLABS_AGENT_ID is not configured.");
-      return;
-    }
+    setPreparing(true);
+    try {
+      if (!(await requestMic())) return;
 
+      let signedUrl: string;
+      try {
+        signedUrl = await fetchSignedUrl();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Couldn't start the voice session.");
+        return;
+      }
+
+      answersRef.current = [];
+      setAnswers([]);
+      transcriptRef.current = [];
+      setTranscript([]);
+      setLimitMs(config.durationMinutes * 60_000);
+      evalSeq.current.clear();
+      lastNudge.current.clear();
+      timing.current = { listeningSince: 0, lastMessageAt: 0, turnMs: 0, vadMs: 0, vadEvents: 0, lastVadAt: 0 };
+
+      // Persona voice + prompt go in as session overrides; the signed URL only authorizes the agent.
+      const { voiceId } = getPersona(config.persona);
+      setCallPersona(config.persona);
+      conversation.startSession({
+        signedUrl,
+        overrides: {
+          agent: {
+            prompt: { prompt: buildAgentPrompt({ persona: config.persona, resume, job, config }) },
+            firstMessage: buildFirstMessage(config.persona, resume, job),
+          },
+          ...(voiceId && { tts: { voiceId } }),
+        },
+        dynamicVariables: buildDynamicVariables({ resume, job, config }),
+      });
+    } finally {
+      setPreparing(false);
+    }
+  }
+
+  // Ask for the mic up front so a denial gets a clear message instead of a failed connection.
+  async function requestMic(): Promise<boolean> {
     if (!navigator.mediaDevices?.getUserMedia) {
       setMic("unavailable");
       setError("This browser doesn't support microphone access.");
-      return;
+      return false;
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -197,30 +321,47 @@ export function useInterviewEngine() {
           ? "Microphone access is blocked. Allow it in your browser's site settings, then try again."
           : "No microphone was found. Connect one and try again.",
       );
-      return;
+      return false;
     }
-
-    answersRef.current = [];
-    setAnswers([]);
-    setTranscript([]);
-    evalSeq.current.clear();
-    lastNudge.current.clear();
-
-    conversation.startSession({
-      agentId,
-      overrides: {
-        agent: {
-          prompt: { prompt: buildAgentPrompt({ persona: config.persona, resume, job, config }) },
-          firstMessage: buildFirstMessage(config.persona, resume, job),
-        },
-      },
-    });
+    return true;
   }
 
   function endInterview() {
     conversation.endSession();
     void finish();
   }
+
+  // Keep the timer effect pointed at the latest endInterview without re-arming the interval.
+  const endInterviewRef = useRef(endInterview);
+  useEffect(() => {
+    endInterviewRef.current = endInterview;
+  });
+
+  // Time management: warn the agent near the limit, tell it time's up at the limit, and end the
+  // call automatically after a short wrap-up grace period.
+  useEffect(() => {
+    if (callStartedAt === null || conversation.status !== "connected" || !limitMs) return;
+    const minutes = sessionRef.current.config.durationMinutes;
+    const id = setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      const elapsed = t - callStartedAt;
+      const notes = timeNotes.current;
+      if (!notes.warned && elapsed >= limitMs - warningLeadMs(minutes)) {
+        notes.warned = true;
+        sendContextualUpdate(timeWarningNote(Math.max(0, Math.round((limitMs - elapsed) / 1000))));
+      }
+      if (!notes.timeUp && elapsed >= limitMs) {
+        notes.timeUp = true;
+        sendContextualUpdate(TIME_UP_NOTE);
+      }
+      if (!notes.ended && elapsed >= limitMs + WRAP_UP_GRACE_MS) {
+        notes.ended = true;
+        endInterviewRef.current();
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [callStartedAt, conversation.status, limitMs, sendContextualUpdate]);
 
   function switchPersona(persona: InterviewerPersona) {
     if (persona === sessionRef.current.config.persona) return;
@@ -244,6 +385,10 @@ export function useInterviewEngine() {
     getInputFrequencyData: conversation.getInputByteFrequencyData,
     getOutputFrequencyData: conversation.getOutputByteFrequencyData,
     mic,
+    preparing,
+    callPersona,
+    elapsedMs: callStartedAt === null ? 0 : Math.max(0, now - callStartedAt),
+    limitMs,
     error: error ?? session.error ?? null,
     transcript,
     answers,

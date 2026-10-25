@@ -8,6 +8,7 @@ const ICONS: Record<InterviewerPersona, LucideIcon> = {
   grilling: Flame,
 };
 
+// Compact mid-call style switcher (the voice stays the same; only the style changes).
 export function PersonaSwitcher({
   value,
   disabled,
@@ -18,7 +19,7 @@ export function PersonaSwitcher({
   onChange: (persona: InterviewerPersona) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label="Interviewer persona" className="flex flex-wrap gap-1 rounded-lg bg-stone-100 p-1">
+    <div role="radiogroup" aria-label="Interviewer style" className="flex flex-wrap gap-1 rounded-xl border border-line bg-white/5 p-1">
       {PERSONAS.map((p) => {
         const Icon = ICONS[p.id];
         const selected = value === p.id;
@@ -28,14 +29,16 @@ export function PersonaSwitcher({
             type="button"
             role="radio"
             aria-checked={selected}
-            title={p.description}
+            title={`${p.label}: ${p.description}`}
             disabled={disabled}
             onClick={() => onChange(p.id)}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-              selected ? "bg-aggie text-white shadow-sm" : "text-stone-600 hover:bg-white hover:text-stone-900"
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 ${
+              selected
+                ? "bg-gradient-to-b from-maroon-600 to-aggie text-white shadow-md shadow-maroon-900/50"
+                : "text-fg-muted hover:bg-white/5 hover:text-fg"
             }`}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-3.5 w-3.5" />
             {p.label}
           </button>
         );

@@ -4,10 +4,15 @@ export interface PersonaProfile {
   id: InterviewerPersona;
   label: string;
   interviewerName: string;
+  // ElevenLabs voice for this interviewer; omit to use the agent's default voice.
+  voiceId?: string;
   tagline: string;
   description: string;
   // Injected into the ElevenLabs agent prompt.
   style: string;
+  difficulty: 1 | 2 | 3;
+  tags: string[];
+  voiceStyle: string;
 }
 
 export const PERSONAS: PersonaProfile[] = [
@@ -15,6 +20,10 @@ export const PERSONAS: PersonaProfile[] = [
     id: "friendly",
     label: "Friendly Aggie Alum",
     interviewerName: "Riley",
+    difficulty: 1,
+    tags: ["Encouraging", "Gentle follow-ups", "First-run friendly"],
+    voiceStyle: "Warm voice",
+    voiceId: "uHu0tu8NXvFWhmnFp4ZR",
     tagline: "Warm and encouraging",
     description: "A former Aggie who gives you room to think and asks gentle follow-ups. Good for a first run.",
     style:
@@ -26,6 +35,10 @@ export const PERSONAS: PersonaProfile[] = [
     id: "strict",
     label: "Professional Recruiter",
     interviewerName: "Morgan",
+    difficulty: 2,
+    tags: ["Structured", "STAR-focused", "Neutral"],
+    voiceStyle: "Polished voice",
+    voiceId: "v61mxH30651CgTnSC8le",
     tagline: "Structured and by the book",
     description: "A corporate recruiter who expects clear STAR answers and moves on when you drift.",
     style:
@@ -36,7 +49,11 @@ export const PERSONAS: PersonaProfile[] = [
   {
     id: "grilling",
     label: "High-Pressure Interviewer",
-    interviewerName: "Jordan",
+    interviewerName: "Alex",
+    difficulty: 3,
+    tags: ["Skeptical", "Pushes for metrics", "Fast-paced"],
+    voiceStyle: "Stern voice",
+    voiceId: "wqKtomEaI22L2mdOxll3",
     tagline: "High pressure",
     description: "Challenges your claims, interrupts vague answers, and digs for specifics and metrics.",
     style:

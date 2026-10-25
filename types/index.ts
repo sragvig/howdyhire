@@ -97,6 +97,25 @@ export interface QuestionFeedback {
   strengths: string[];
   improvements: string[];
   coachingNote?: string; // from the post-interview Gemini report
+  sampleAnswer?: string; // stronger STAR rewrite, only for answers that needed work
+}
+
+export interface FillerWordCount {
+  word: string;
+  count: number;
+}
+
+// Client-side delivery analytics computed from the candidate's transcript.
+export interface SpeechAnalytics {
+  totalWords: number;
+  speakingMs: number;
+  wordsPerMinute: number | null; // null when there wasn't enough timing data
+  timingMethod: "voice-activity" | "turn-timing";
+  fillers: FillerWordCount[]; // sorted by count, descending
+  fillerTotal: number;
+  fillersPer100Words: number;
+  firstPersonSingular: number; // I / me / my
+  firstPersonPlural: number; // we / us / our
 }
 
 export interface Feedback {
@@ -105,6 +124,8 @@ export interface Feedback {
   questions: QuestionFeedback[];
   report?: SessionReport;
   reportError?: string; // set when the AI report couldn't be generated; local scores still apply
+  speech?: SpeechAnalytics;
+  transcript?: TranscriptEntry[]; // full cleaned conversation, kept for the Practice Library
 }
 
 export type ReadinessTier = "interview-ready" | "almost-ready" | "developing" | "needs-practice";
@@ -121,12 +142,16 @@ export interface SessionReport {
   starBreakdown: Record<"situation" | "task" | "action" | "result", StarComponentInsight>;
   keyStrengths: { title: string; evidence: string }[];
   improvements: { title: string; detail: string; competency?: string }[];
+  aggieSpirit: string; // feedback framed around Texas A&M core values
   generatedAt: string; // ISO timestamp
 }
 
+export type InterviewDuration = 2 | 5 | 10 | 15 | 20; // minutes
+
 export interface InterviewSessionConfig {
   persona: InterviewerPersona;
-  questionCount: number;
+  durationMinutes: InterviewDuration;
+  questionCount: number; // derived from duration
   focusCompetencies: string[]; // subset of JobPosting.keyCompetencies names
 }
 
@@ -177,6 +202,22 @@ export interface AnswerRecord {
   question: string;
   answer: string;
   evaluation?: StarEvaluation;
+  heuristic?: Record<StarElement, boolean>; // instant client-side cue detection
   evaluating: boolean;
   evaluationError?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Practice Library (saved past interviews)
+// ---------------------------------------------------------------------------
+
+export interface PastInterview {
+  id: string; // InterviewSession.id
+  completedAt: string; // ISO timestamp
+  startedAt?: string;
+  persona: InterviewerPersona;
+  durationMinutes: InterviewDuration;
+  candidateName?: string;
+  job: Pick<JobPosting, "id" | "title" | "company" | "description" | "keyCompetencies" | "source">;
+  feedback: Feedback;
 }

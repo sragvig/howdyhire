@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { geminiErrorMessage } from "@/lib/server/gemini";
 import { evaluateStarTurn } from "@/lib/server/star-evaluator";
 
 const MAX_QUESTION_CHARS = 2_000;
@@ -31,6 +32,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ evaluation });
   } catch (err) {
     console.error("evaluate-turn failed", err);
-    return badRequest("Couldn't evaluate that answer", 502);
+    return badRequest(geminiErrorMessage(err) ?? "Couldn't evaluate that answer", 502);
   }
 }

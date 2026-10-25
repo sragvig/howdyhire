@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { geminiErrorMessage } from "@/lib/server/gemini";
 import type { StarScore } from "@/types";
 import { generateSessionSummary, type SummaryInput } from "@/lib/server/summary-generator";
+import { cleanTranscriptText } from "@/lib/transcript-clean";
 
 const MAX_QUESTIONS = 20;
 const MAX_TOTAL_CHARS = 60_000;
@@ -28,8 +30,9 @@ function parseBody(body: unknown): SummaryInput | string {
     const q = (raw ?? {}) as Record<string, unknown>;
     const star = (q.star ?? {}) as Record<string, unknown>;
     return {
-      question: str(q.question, 2_000),
-      answer: str(q.answer, 10_000),
+      // The client already strips voice tags; repeat here so the model never sees them.
+      question: cleanTranscriptText(str(q.question, 2_000)),
+      answer: cleanTranscriptText(str(q.answer, 10_000)),
       star: { situation: num(star.situation), task: num(star.task), action: num(star.action), result: num(star.result) } satisfies StarScore,
     };
   });
@@ -62,6 +65,6 @@ export async function POST(req: Request) {
     return NextResponse.json(await generateSessionSummary(input));
   } catch (err) {
     console.error("generate-summary failed", err);
-    return badRequest("Couldn't generate the interview report", 502);
+    return badRequest(geminiErrorMessage(err) ?? "Couldn't generate the interview report", 502);
   }
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { geminiErrorMessage } from "@/lib/server/gemini";
 import { FetchPageError, fetchPageText } from "@/lib/server/fetch-page";
 import { NotAJobPostingError, parseJobPosting } from "@/lib/server/job-parser";
 
@@ -46,6 +47,6 @@ export async function POST(req: Request) {
       );
     }
     console.error("parse-job failed", err);
-    return badRequest("We couldn't read that job posting. Try again.", 502);
+    return badRequest(geminiErrorMessage(err) ?? "We couldn't read that job posting. Try again.", 502);
   }
 }

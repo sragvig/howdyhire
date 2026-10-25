@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Aggie Maroon scale — 800 is the official #500000 */
+  /* Aggie Maroon scale (800 is the official #500000) */
   --color-maroon-50: #fdf3f3;
   --color-maroon-100: #fbe4e4;
   --color-maroon-200: #f5c6c6;
@@ -13,20 +13,146 @@
   --color-maroon-800: #500000;
   --color-maroon-900: #3c0000;
   --color-maroon-950: #240000;
-
   --color-aggie: #500000;
+
+  /* Highlight gold for badges and accents */
+  --color-gold-200: #f3e3a8;
+  --color-gold-300: #e8cc6a;
+  --color-gold-400: #d4af37;
+  --color-gold-500: #b8932a;
+  --color-gold-600: #8f7020;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display-face);
+
+  --animate-halo: halo 2.6s ease-out infinite;
+  --animate-fade-up: fade-up 0.45s ease-out both;
+  --animate-toast-in: toast-in 0.3s ease-out both;
+
+  @keyframes halo {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.55;
+    }
+    100% {
+      transform: scale(1.65);
+      opacity: 0;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* Semantic tokens: components use these, so print can flip the whole UI to light. */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-surface-muted: var(--surface-muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-accent: var(--accent-fg);
+  --color-gold: var(--gold-fg);
+  --color-good: var(--good-fg);
+  --color-warn: var(--warn-fg);
+  --color-bad: var(--bad-fg);
+}
+
+:root {
+  color-scheme: dark;
+  --canvas: #0f172a;
+  --surface: rgb(30 41 59 / 0.55);
+  --surface-strong: #1e293b;
+  --surface-muted: rgb(255 255 255 / 0.04);
+  --line: rgb(255 255 255 / 0.1);
+  --line-strong: rgb(255 255 255 / 0.2);
+  --fg: #f8fafc;
+  --fg-muted: #cbd5e1;
+  --fg-subtle: #94a3b8;
+  /* #500000 is unreadable as text on dark surfaces; accent text uses a light maroon tint. */
+  --accent-fg: #f2a7a7;
+  --gold-fg: #e8cc6a;
+  --good-fg: #6ee7b7;
+  --warn-fg: #fcd34d;
+  --bad-fg: #fca5a5;
 }
 
 body {
-  @apply bg-stone-50 text-stone-900;
+  background:
+    radial-gradient(1100px 620px at 8% -12%, rgb(80 0 0 / 0.45), transparent 60%),
+    radial-gradient(900px 520px at 105% -5%, rgb(212 175 55 / 0.07), transparent 60%),
+    var(--canvas);
+  background-attachment: fixed;
+  color: var(--fg);
+}
+
+::selection {
+  background: rgb(146 24 24 / 0.6);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-fg);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.15) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @media print {
+  :root {
+    color-scheme: light;
+    --canvas: #ffffff;
+    --surface: #ffffff;
+    --surface-strong: #ffffff;
+    --surface-muted: #f5f5f4;
+    --line: #e7e5e4;
+    --line-strong: #d6d3d1;
+    --fg: #1c1917;
+    --fg-muted: #44403c;
+    --fg-subtle: #78716c;
+    --accent-fg: #500000;
+    --gold-fg: #8f7020;
+    --good-fg: #047857;
+    --warn-fg: #b45309;
+    --bad-fg: #b91c1c;
+  }
   body {
-    background: white;
+    background: #fff;
   }
   /* Keep maroon fills and chart bars when printing / saving as PDF. */
   * {

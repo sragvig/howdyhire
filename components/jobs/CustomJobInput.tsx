@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Link2, Loader2, Sparkles, TextCursorInput } from "lucide-react";
 import type { JobPosting } from "@/types";
+import { btn, input } from "@/components/ui/styles";
 
 type Mode = "url" | "text";
 
@@ -47,8 +48,8 @@ export function CustomJobInput({
         setMode(m);
         setError(null);
       }}
-      className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium ${
-        mode === m ? "bg-white text-aggie shadow-sm" : "text-stone-600 hover:text-stone-900"
+      className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-300 ${
+        mode === m ? "bg-gradient-to-b from-maroon-600 to-aggie text-white shadow-md shadow-maroon-900/50" : "text-fg-muted hover:text-fg"
       }`}
     >
       <Icon className="h-4 w-4" /> {label}
@@ -57,7 +58,7 @@ export function CustomJobInput({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="inline-flex rounded-lg bg-stone-100 p-1">
+      <div className="inline-flex rounded-xl border border-line bg-white/5 p-1">
         {tab("url", "Paste URL", Link2)}
         {tab("text", "Paste description", TextCursorInput)}
       </div>
@@ -69,7 +70,7 @@ export function CustomJobInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder="https://careers.example.com/jobs/123"
           disabled={disabled || loading}
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-aggie focus:outline-none focus:ring-1 focus:ring-aggie disabled:bg-stone-50"
+          className={input}
         />
       ) : (
         <textarea
@@ -78,22 +79,18 @@ export function CustomJobInput({
           placeholder="Paste the full job description here…"
           rows={6}
           disabled={disabled || loading}
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-aggie focus:outline-none focus:ring-1 focus:ring-aggie disabled:bg-stone-50"
+          className={input}
         />
       )}
 
       {mode === "url" && (
-        <p className="text-xs text-stone-500">
-          Postings behind a login (like Handshake) can&apos;t be fetched — paste the description instead.
+        <p className="text-xs text-fg-subtle">
+          Postings behind a login (like Handshake or HireAggies) can&apos;t be fetched. Use the Chrome extension or paste the description.
         </p>
       )}
-      {error && <p className="text-sm text-red-700">{error}</p>}
+      {error && <p className="text-sm text-bad">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={disabled || loading || !value.trim()}
-        className="inline-flex items-center gap-2 rounded-md bg-aggie px-4 py-2 text-sm font-semibold text-white hover:bg-maroon-700 disabled:cursor-not-allowed disabled:bg-stone-300"
-      >
+      <button type="submit" disabled={disabled || loading || !value.trim()} className={btn.primary}>
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {loading ? "Analyzing…" : "Import posting"}
       </button>

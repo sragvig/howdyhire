@@ -13,21 +13,26 @@ export function TranscriptFeed({ entries, interviewerName }: { entries: Transcri
   }, [entries]);
 
   return (
-    <Card title="Live transcript" icon={<MessageSquareText className="h-5 w-5" />}>
+    <Card title="Live transcript" icon={<MessageSquareText />}>
       <div ref={scroller} className="h-80 space-y-3 overflow-y-auto pr-1" aria-live="polite">
         {entries.length === 0 ? (
-          <p className="pt-24 text-center text-sm text-stone-400">The conversation will appear here.</p>
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <MessageSquareText className="h-8 w-8 text-fg-subtle/50" />
+            <p className="mt-2 text-sm text-fg-subtle">The conversation will appear here as you speak.</p>
+          </div>
         ) : (
           entries.map((e) => {
             const isCandidate = e.speaker === "candidate";
             return (
-              <div key={e.id} className={`flex ${isCandidate ? "justify-end" : "justify-start"}`}>
+              <div key={e.id} className={`flex animate-fade-up ${isCandidate ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                    isCandidate ? "rounded-br-sm bg-aggie text-white" : "rounded-bl-sm bg-stone-100 text-stone-800"
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                    isCandidate
+                      ? "rounded-br-md bg-gradient-to-br from-maroon-600 to-aggie text-white shadow-lg shadow-maroon-950/40"
+                      : "rounded-bl-md border border-line bg-white/5 text-fg"
                   }`}
                 >
-                  <p className={`mb-0.5 text-xs font-semibold ${isCandidate ? "text-maroon-200" : "text-aggie"}`}>
+                  <p className={`mb-0.5 text-[11px] font-semibold uppercase tracking-wider ${isCandidate ? "text-maroon-200" : "text-gold"}`}>
                     {isCandidate ? "You" : interviewerName}
                   </p>
                   {e.text}

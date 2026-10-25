@@ -11,8 +11,7 @@ export function QuestionScoreChart({ questions }: { questions: QuestionFeedback[
   return (
     <figure>
       <div className="flex gap-2">
-        {/* y-axis labels */}
-        <div className="relative h-48 w-8 shrink-0 text-right text-xs tabular-nums text-stone-400">
+        <div className="relative h-48 w-8 shrink-0 text-right text-xs tabular-nums text-fg-subtle">
           {GRID.map((g) => (
             <span key={g} className="absolute right-0 translate-y-1/2" style={{ bottom: `${g}%` }}>
               {g}
@@ -24,7 +23,7 @@ export function QuestionScoreChart({ questions }: { questions: QuestionFeedback[
           {GRID.map((g) => (
             <div
               key={g}
-              className={`absolute inset-x-0 border-t ${g === 0 ? "border-stone-300" : "border-dashed border-stone-100"}`}
+              className={`absolute inset-x-0 border-t ${g === 0 ? "border-line-strong" : "border-dashed border-line"}`}
               style={{ bottom: `${g}%` }}
             />
           ))}
@@ -40,15 +39,15 @@ export function QuestionScoreChart({ questions }: { questions: QuestionFeedback[
                   aria-label={`Question ${i + 1}: ${score} out of 100`}
                 >
                   <div
-                    className="w-full max-w-10 rounded-t bg-maroon-700 transition-colors group-hover:bg-aggie group-focus-visible:bg-aggie"
+                    className="w-full max-w-10 rounded-t-md bg-gradient-to-t from-maroon-800 to-maroon-500 transition-all duration-300 group-hover:from-maroon-700 group-hover:to-maroon-300 group-hover:shadow-lg group-hover:shadow-maroon-700/40 group-focus-visible:to-maroon-300"
                     style={{ height: `${Math.max(score, 1)}%` }}
                   />
-                  <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-stone-900 p-3 text-xs text-white shadow-lg group-hover:block group-focus-visible:block">
-                    <p className="font-semibold">
+                  <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-56 -translate-x-1/2 rounded-xl border border-line bg-surface-strong p-3 text-xs shadow-2xl shadow-black/50 group-hover:block group-focus-visible:block">
+                    <p className="font-semibold text-fg">
                       Q{i + 1} · {score}/100
                     </p>
-                    <p className="mt-1 line-clamp-2 text-stone-300">{q.question || "Question not captured"}</p>
-                    <p className="mt-1.5 tabular-nums text-stone-200">
+                    <p className="mt-1 line-clamp-2 text-fg-muted">{q.question || "Question not captured"}</p>
+                    <p className="mt-1.5 tabular-nums text-fg-subtle">
                       S {q.star.situation} · T {q.star.task} · A {q.star.action} · R {q.star.result}
                     </p>
                   </div>
@@ -59,7 +58,7 @@ export function QuestionScoreChart({ questions }: { questions: QuestionFeedback[
         </div>
       </div>
 
-      <div className="ml-10 flex justify-around gap-2 px-2 pt-2 text-xs text-stone-500">
+      <div className="ml-10 flex justify-around gap-2 px-2 pt-2 text-xs text-fg-subtle">
         {questions.map((_, i) => (
           <span key={i} className="max-w-14 flex-1 text-center">
             Q{i + 1}

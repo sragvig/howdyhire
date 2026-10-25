@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { geminiErrorMessage } from "@/lib/server/gemini";
 import { parseResume, type ResumeInput } from "@/lib/server/resume-parser";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -53,6 +54,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ resume });
   } catch (err) {
     console.error("parse-resume failed", err);
-    return badRequest("We couldn't parse that resume. Try again or paste the text instead.", 502);
+    return badRequest(geminiErrorMessage(err) ?? "We couldn't parse that resume. Try again or paste the text instead.", 502);
   }
 }

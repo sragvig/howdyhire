@@ -1,6 +1,7 @@
 import "server-only";
-import type { ReadinessTier, SessionReport, StarScore } from "@/types";
+import type { SessionReport, StarScore } from "@/types";
 import { generateJson } from "./gemini";
+import { tierForScore } from "@/lib/readiness";
 
 export interface SummaryInput {
   job: {
@@ -16,25 +17,35 @@ export interface SummaryInput {
 export interface QuestionNote {
   index: number;
   coachingNote: string;
+  sampleAnswer?: string;
 }
 
-const insight = {
+const insight = (criterion: string) => ({
   type: "object",
+  description: `Judge on: ${criterion}`,
   properties: {
-    strength: { type: "string", description: "One sentence on what the candidate did well for this element" },
-    weakness: { type: "string", description: "One sentence on the most important gap for this element" },
+    strength: { type: "string", description: `One sentence on what the candidate did well (${criterion})` },
+    weakness: { type: "string", description: `One sentence on the most important gap (${criterion})` },
   },
   required: ["strength", "weakness"],
-};
+});
 
 const SUMMARY_SCHEMA = {
   type: "object",
   properties: {
     overallScore: { type: "integer", minimum: 0, maximum: 100 },
-    headline: { type: "string", description: "Two-sentence overall assessment addressed to the candidate" },
+    headline: {
+      type: "string",
+      description: "Executive summary: 2-3 sentences on overall performance, addressed to the candidate",
+    },
     starBreakdown: {
       type: "object",
-      properties: { situation: insight, task: insight, action: insight, result: insight },
+      properties: {
+        situation: insight("clarity and context setting"),
+        task: insight("how clearly the problem and their personal responsibility were defined"),
+        action: insight("specific personal contributions; 'I' statements versus vague 'we' language"),
+        result: insight("quantifiable outcomes and lessons learned"),
+      },
       required: ["situation", "task", "action", "result"],
     },
     keyStrengths: {
@@ -64,6 +75,11 @@ const SUMMARY_SCHEMA = {
         required: ["title", "detail"],
       },
     },
+    aggieSpirit: {
+      type: "string",
+      description:
+        "2-3 upbeat sentences connecting the candidate's answers to Aggie Core Values (Respect, Excellence, Leadership, Loyalty, Integrity, Selfless Service), citing a specific moment. End with \"Gig 'em!\"",
+    },
     questionNotes: {
       type: "array",
       items: {
@@ -71,12 +87,21 @@ const SUMMARY_SCHEMA = {
         properties: {
           index: { type: "integer" },
           coachingNote: { type: "string", description: "2-3 sentences: what worked and how to make this answer stronger" },
+          sampleAnswer: {
+            type: "string",
+            description:
+              "Only if the answer needed improvement (any STAR score below 7): a 4-6 sentence rewrite of the candidate's SAME story " +
+              "with strong STAR structure and 'I' statements. Use only facts they gave. Never add roles, actions, meetings, " +
+              "events, or metrics they didn't mention: put a bracketed placeholder instead, e.g. [the first step you took], " +
+              "[your role], [number]. A thin answer should produce a template with more placeholders, not invented detail. " +
+              "Omit for strong answers.",
+          },
         },
         required: ["index", "coachingNote"],
       },
     },
   },
-  required: ["overallScore", "headline", "starBreakdown", "keyStrengths", "improvements", "questionNotes"],
+  required: ["overallScore", "headline", "starBreakdown", "keyStrengths", "improvements", "aggieSpirit", "questionNotes"],
 };
 
 const SYSTEM_INSTRUCTION = `You are a career coach writing a post-interview report for a Texas A&M student who just finished a mock behavioral interview.
@@ -85,14 +110,9 @@ Per-answer STAR scores (0-10) from a live evaluator are included. Ground overall
 Calibrate: 85+ means ready for a real interview, 70-84 almost ready, 50-69 developing, below 50 needs significant practice.
 Every strength and improvement must reference what the candidate actually said. Never invent experiences.
 Tailor improvements to the target job's competencies. Write directly to the candidate ("you"). Be honest but encouraging.
-Return one questionNotes entry per question, using the question's index.`;
+Return one questionNotes entry per question, using the question's index.
+Sample answers must never invent experiences, employers, or numbers: they rephrase the candidate's own story.`;
 
-export function tierForScore(score: number): ReadinessTier {
-  if (score >= 85) return "interview-ready";
-  if (score >= 70) return "almost-ready";
-  if (score >= 50) return "developing";
-  return "needs-practice";
-}
 
 type RawSummary = Omit<SessionReport, "readinessTier" | "generatedAt"> & { questionNotes: QuestionNote[] };
 
@@ -131,6 +151,7 @@ export async function generateSessionSummary(
       readinessTier: tierForScore(overallScore),
       keyStrengths: raw.keyStrengths ?? [],
       improvements: raw.improvements ?? [],
+      aggieSpirit: raw.aggieSpirit ?? "",
       generatedAt: new Date().toISOString(),
     },
     questionNotes: (questionNotes ?? []).filter((n) => Number.isInteger(n.index)),

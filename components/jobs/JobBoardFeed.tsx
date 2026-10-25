@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Sparkles } from "lucide-react";
 import type { JobCategory, JobPosting } from "@/types";
 import { AGGIE_JOB_BOARD } from "@/lib/mock-jobs";
 import { useSession } from "@/components/providers/SessionProvider";
 import { Card } from "@/components/dashboard/Card";
+import { useToast } from "@/components/ui/Toast";
+import { input } from "@/components/ui/styles";
 import { CustomJobInput } from "./CustomJobInput";
 import { JobCard } from "./JobCard";
 
@@ -18,14 +21,17 @@ const FILTERS: { id: Filter; label: string }[] = [
 ];
 
 export function JobBoardFeed() {
-  const { session, setJob } = useSession();
+  const { session, setJob, reset } = useSession();
+  const router = useRouter();
+  const toast = useToast();
   // Seed with the selected custom job so it survives navigating away and back.
   const [customJobs, setCustomJobs] = useState<JobPosting[]>(() =>
     session.job?.source === "custom" ? [session.job] : [],
   );
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
-  const locked = session.status !== "idle";
+  // Only an interview in progress locks the board; a finished one is replaced by a fresh session.
+  const locked = session.status === "active" || session.status === "scoring";
 
   const jobs = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -39,23 +45,32 @@ export function JobBoardFeed() {
     );
   }, [filter, query]);
 
+  // "Practice" on any card makes it the active job and goes straight to the interview room.
+  function practice(job: JobPosting) {
+    if (session.status === "complete") reset();
+    setJob(job);
+    toast({ tone: "success", title: "Active job set", description: `${job.title} @ ${job.company}` });
+    router.push("/interview");
+  }
+
   function handleImported(job: JobPosting) {
     setCustomJobs((prev) => [job, ...prev]);
+    if (session.status === "complete") reset();
     setJob(job);
   }
 
   return (
     <div className="space-y-6">
-      <Card title="Import a posting" icon={<Sparkles className="h-5 w-5" />}>
+      <Card title="Import a posting" icon={<Sparkles />}>
         <CustomJobInput disabled={locked} onImported={handleImported} />
       </Card>
 
       {customJobs.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-semibold text-stone-900">Your imported postings</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-fg-subtle">Your imported postings</h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {customJobs.map((job) => (
-              <JobCard key={job.id} job={job} selected={session.job?.id === job.id} disabled={locked} onSelect={setJob} />
+              <JobCard key={job.id} job={job} selected={session.job?.id === job.id} disabled={locked} onSelect={practice} />
             ))}
           </div>
         </section>
@@ -63,16 +78,18 @@ export function JobBoardFeed() {
 
       <section className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="font-semibold text-stone-900">Aggie Job Board</h2>
+          <h2 className="font-display text-lg font-semibold text-fg">Aggie Job Board</h2>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="inline-flex rounded-lg bg-stone-100 p-1">
+            <div className="inline-flex rounded-xl border border-line bg-white/5 p-1">
               {FILTERS.map((f) => (
                 <button
                   key={f.id}
                   type="button"
                   onClick={() => setFilter(f.id)}
-                  className={`rounded-md px-3 py-1 text-sm font-medium ${
-                    filter === f.id ? "bg-white text-aggie shadow-sm" : "text-stone-600 hover:text-stone-900"
+                  className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-300 ${
+                    filter === f.id
+                      ? "bg-gradient-to-b from-maroon-600 to-aggie text-white shadow-md shadow-maroon-900/50"
+                      : "text-fg-muted hover:text-fg"
                   }`}
                 >
                   {f.label}
@@ -81,25 +98,25 @@ export function JobBoardFeed() {
             </div>
             <label className="relative">
               <span className="sr-only">Search jobs</span>
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search roles, companies, skills"
-                className="w-full rounded-md border border-stone-300 py-1.5 pl-8 pr-3 text-sm focus:border-aggie focus:outline-none focus:ring-1 focus:ring-aggie sm:w-64"
+                className={`${input} py-2 pl-9 sm:w-64`}
               />
             </label>
           </div>
         </div>
 
         {jobs.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">
+          <p className="rounded-2xl border border-dashed border-line-strong p-8 text-center text-sm text-fg-subtle">
             No roles match your search.
           </p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {jobs.map((job) => (
-              <JobCard key={job.id} job={job} selected={session.job?.id === job.id} disabled={locked} onSelect={setJob} />
+              <JobCard key={job.id} job={job} selected={session.job?.id === job.id} disabled={locked} onSelect={practice} />
             ))}
           </div>
         )}

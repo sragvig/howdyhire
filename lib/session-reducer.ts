@@ -36,7 +36,8 @@ export function canTransition(from: SessionStatus, to: SessionStatus) {
 
 export const DEFAULT_CONFIG: InterviewSessionConfig = {
   persona: "friendly",
-  questionCount: 5,
+  durationMinutes: 2,
+  questionCount: 3,
   focusCompetencies: [],
 };
 
